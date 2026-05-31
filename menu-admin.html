@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>195 Café — Menu Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#F7F0E6;--warm-white:#FDF9F4;--brown-light:#C8A882;--brown-mid:#9B7355;--brown-dark:#5C3D1E;--espresso:#2C1A0E;--gold:#D4A853;--text-body:#4A3728;--success:#2D6A4F;--success-bg:#D8F3DC;--danger:#9B2226;--danger-bg:#FFE8E8;--sidebar-w:240px;}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text-body);}
+
+  /* LOGIN */
+  #login-screen{position:fixed;inset:0;background:var(--espresso);display:flex;align-items:center;justify-content:center;z-index:999;}
+  .login-box{background:var(--warm-white);border-radius:16px;padding:2.5rem 2rem;width:340px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.4);}
+  .login-logo{font-family:"Cormorant Garamond",serif;font-size:2rem;font-weight:600;color:var(--espresso);}
+  .login-logo span{color:var(--brown-mid);}
+  .login-sub{font-size:0.78rem;color:var(--brown-light);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:2rem;}
+  .login-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);margin-bottom:0.4rem;text-align:left;}
+  .login-input{width:100%;padding:0.75rem 1rem;border:1.5px solid rgba(200,168,130,0.4);border-radius:8px;font-size:0.95rem;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--espresso);margin-bottom:1rem;outline:none;transition:border-color 0.2s;}
+  .login-input:focus{border-color:var(--brown-mid);}
+  .login-btn{width:100%;padding:0.85rem;background:var(--brown-dark);color:var(--cream);border:none;border-radius:8px;font-size:0.85rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:"DM Sans",sans-serif;}
+  .login-btn:hover{background:var(--espresso);}
+  .login-error{font-size:0.8rem;color:var(--danger);margin-top:0.75rem;display:none;}
+
+  /* LAYOUT */
+  #app{display:none;height:100vh;overflow:hidden;flex-direction:row;}
+  #app.visible{display:flex;}
+  .sidebar{width:var(--sidebar-w);background:var(--espresso);color:var(--cream);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+  .sidebar-brand{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+  .sidebar-brand-name{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:600;color:var(--cream);}
+  .sidebar-brand-name span{color:var(--brown-light);}
+  .sidebar-brand-sub{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,240,230,0.35);margin-top:2px;}
+  .sidebar-section{padding:1rem 0.75rem 0.5rem;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,240,230,0.3);}
+  .sidebar-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1.25rem;font-size:0.85rem;color:rgba(247,240,230,0.65);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;}
+  .sidebar-item:hover{background:rgba(255,255,255,0.06);color:var(--cream);}
+  .sidebar-item.active{background:rgba(200,168,130,0.15);color:var(--cream);border-left-color:var(--brown-light);}
+  .sidebar-item .icon{font-size:1rem;width:20px;text-align:center;}
+  .sidebar-footer{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08);}
+  .logout-btn{font-size:0.75rem;color:rgba(247,240,230,0.4);cursor:pointer;background:none;border:none;font-family:"DM Sans",sans-serif;display:flex;align-items:center;gap:0.5rem;}
+  .logout-btn:hover{color:var(--brown-light);}
+
+  /* MAIN */
+  .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+  .topbar{background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+  .topbar-title{font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:500;color:var(--espresso);}
+  .topbar-sub{font-size:0.75rem;color:var(--brown-light);margin-top:1px;}
+  .topbar-actions{display:flex;gap:0.75rem;align-items:center;}
+  .btn{padding:0.55rem 1.1rem;border-radius:8px;font-size:0.8rem;font-weight:500;cursor:pointer;border:none;font-family:"DM Sans",sans-serif;transition:all 0.15s;display:inline-flex;align-items:center;gap:0.4rem;}
+  .btn-primary{background:var(--brown-dark);color:var(--cream);}
+  .btn-primary:hover{background:var(--espresso);}
+  .btn-outline{background:transparent;color:var(--brown-dark);border:1.5px solid rgba(92,61,30,0.3);}
+  .btn-outline:hover{border-color:var(--brown-dark);background:rgba(92,61,30,0.05);}
+  .btn-danger{background:var(--danger-bg);color:var(--danger);border:1.5px solid rgba(155,34,38,0.2);}
+  .btn-danger:hover{background:#ffd0d0;}
+  .btn-sm{padding:0.35rem 0.75rem;font-size:0.75rem;}
+  .content{padding:1.5rem 2rem;flex:1;}
+
+  /* STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+  .stat-card{background:var(--warm-white);border-radius:12px;padding:1rem 1.25rem;border:1px solid rgba(200,168,130,0.2);}
+  .stat-card-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--brown-light);margin-bottom:0.4rem;}
+  .stat-card-val{font-family:"Cormorant Garamond",serif;font-size:2rem;font-weight:500;color:var(--espresso);line-height:1;}
+  .stat-card-sub{font-size:0.72rem;color:var(--brown-mid);margin-top:3px;}
+
+  /* TOOLBAR */
+  .toolbar{display:flex;gap:0.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .search-wrap{position:relative;flex:1;min-width:200px;}
+  .search-input{width:100%;padding:0.6rem 1rem 0.6rem 2.25rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.85rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--espresso);outline:none;}
+  .search-input:focus{border-color:var(--brown-mid);}
+  .search-icon{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--brown-light);}
+  .filter-select{padding:0.6rem 1rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.82rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--text-body);outline:none;cursor:pointer;}
+
+  /* CATEGORY TABS */
+  .cat-tabs{display:flex;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .cat-tab{padding:0.4rem 1rem;border-radius:20px;font-size:0.78rem;font-weight:500;cursor:pointer;border:1.5px solid rgba(200,168,130,0.3);background:var(--warm-white);color:var(--brown-mid);transition:all 0.15s;}
+  .cat-tab.active,.cat-tab:hover{background:var(--brown-dark);color:var(--cream);border-color:var(--brown-dark);}
+
+  /* TABLE */
+  .table-wrap{background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);overflow:hidden;}
+  table{width:100%;border-collapse:collapse;}
+  thead{background:rgba(92,61,30,0.05);}
+  th{padding:0.75rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);font-weight:500;}
+  td{padding:0.85rem 1rem;font-size:0.85rem;border-top:1px solid rgba(200,168,130,0.12);vertical-align:middle;}
+  tr:hover td{background:rgba(200,168,130,0.05);}
+  .item-name{font-weight:500;color:var(--espresso);}
+  .item-name-th{font-size:0.75rem;color:var(--brown-mid);margin-top:2px;font-family:"Sarabun",sans-serif;}
+  .item-cat{display:inline-block;font-size:0.68rem;padding:2px 8px;border-radius:10px;background:rgba(200,168,130,0.15);color:var(--brown-mid);font-weight:500;}
+  .price-cell{font-size:0.8rem;color:var(--text-body);}
+  .price-cell span{display:inline-block;min-width:36px;}
+  .status-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;padding:3px 10px;border-radius:10px;font-weight:500;}
+  .status-available{background:var(--success-bg);color:var(--success);}
+  .status-soldout{background:var(--danger-bg);color:var(--danger);}
+  .actions{display:flex;gap:0.4rem;}
+  .empty-state{text-align:center;padding:3rem;color:var(--brown-light);}
+
+  /* PHOTO THUMBNAILS */
+  .thumb-strip{display:flex;gap:4px;align-items:center;}
+  .thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;border:1px solid rgba(200,168,130,0.3);}
+  .thumb-empty{width:36px;height:36px;border-radius:6px;background:rgba(200,168,130,0.1);border:1px dashed rgba(200,168,130,0.3);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--brown-light);}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(44,26,14,0.5);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--warm-white);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.3);}
+  .modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(200,168,130,0.2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--warm-white);z-index:1;}
+  .modal-title{font-family:"Cormorant Garamond",serif;font-size:1.3rem;font-weight:500;color:var(--espresso);}
+  .modal-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--brown-light);}
+  .modal-body{padding:1.5rem;}
+  .modal-footer{padding:1rem 1.5rem;border-top:1px solid rgba(200,168,130,0.2);display:flex;gap:0.75rem;justify-content:flex-end;background:var(--warm-white);position:sticky;bottom:0;}
+
+  /* FORM */
+  .form-group{margin-bottom:1.1rem;}
+  .form-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);margin-bottom:0.4rem;display:block;font-weight:500;}
+  .form-label .th-badge{font-size:0.65rem;background:rgba(200,168,130,0.2);color:var(--brown-mid);padding:1px 6px;border-radius:8px;font-style:normal;text-transform:none;letter-spacing:0;font-family:"Sarabun",sans-serif;margin-left:4px;}
+  .form-input,.form-select,.form-textarea{width:100%;padding:0.65rem 0.9rem;border:1.5px solid rgba(200,168,130,0.35);border-radius:8px;font-size:0.88rem;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--espresso);outline:none;transition:border-color 0.2s;}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--brown-mid);}
+  .form-input.th-input{font-family:"Sarabun",sans-serif;font-size:0.92rem;}
+  .form-textarea{resize:vertical;min-height:60px;}
+  .form-textarea.th-input{font-family:"Sarabun",sans-serif;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+  .form-hint{font-size:0.7rem;color:var(--brown-light);margin-top:3px;}
+  .form-divider{height:1px;background:rgba(200,168,130,0.25);margin:1.25rem 0;position:relative;}
+  .form-divider-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--warm-white);padding:0 0.75rem;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--brown-light);}
+
+  /* BILINGUAL FIELD GROUP */
+  .bilingual-group{background:var(--cream);border-radius:10px;padding:1rem;margin-bottom:1.1rem;border:1px solid rgba(200,168,130,0.2);}
+  .bilingual-group-title{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--brown-mid);margin-bottom:0.85rem;font-weight:500;}
+
+  /* PHOTO UPLOAD */
+  .photo-upload-area{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem;}
+  .photo-slot{width:100px;height:100px;border-radius:10px;border:2px dashed rgba(200,168,130,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;background:var(--cream);transition:border-color 0.2s;}
+  .photo-slot:hover{border-color:var(--brown-mid);}
+  .photo-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px;}
+  .photo-slot-icon{font-size:1.5rem;color:var(--brown-light);}
+  .photo-slot-label{font-size:0.65rem;color:var(--brown-light);margin-top:4px;}
+  .photo-slot-remove{position:absolute;top:4px;right:4px;background:rgba(155,34,38,0.85);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:0.7rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;}
+  .photo-slot:hover .photo-slot-remove{display:flex;}
+  .photo-slot input[type=file]{display:none;}
+
+  /* TOGGLE */
+  .toggle-wrap{display:flex;align-items:center;gap:0.75rem;}
+  .toggle{position:relative;width:44px;height:24px;cursor:pointer;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:24px;transition:0.3s;}
+  .toggle-slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;}
+  .toggle input:checked+.toggle-slider{background:var(--success);}
+  .toggle input:checked+.toggle-slider:before{transform:translateX(20px);}
+  .toggle-label{font-size:0.85rem;color:var(--text-body);}
+
+  /* CAT LIST */
+  .cat-list{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;}
+  .cat-item{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.9rem;background:var(--cream);border-radius:8px;border:1px solid rgba(200,168,130,0.2);}
+  .cat-item-name{flex:1;}
+  .cat-item-name-en{font-size:0.88rem;font-weight:500;color:var(--espresso);}
+  .cat-item-name-th{font-size:0.78rem;color:var(--brown-mid);font-family:"Sarabun",sans-serif;}
+  .cat-item-count{font-size:0.72rem;color:var(--brown-light);white-space:nowrap;}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--espresso);color:var(--cream);padding:0.75rem 1.25rem;border-radius:10px;font-size:0.85rem;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s;pointer-events:none;display:flex;align-items:center;gap:0.5rem;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{background:var(--success);}
+  .toast.error{background:var(--danger);}
+
+  /* MOBILE */
+  .mobile-header{display:none;background:var(--espresso);padding:0.75rem 1rem;align-items:center;gap:0.75rem;}
+  .hamburger{background:none;border:none;color:var(--cream);font-size:1.3rem;cursor:pointer;}
+  .mobile-title{font-family:"Cormorant Garamond",serif;font-size:1.2rem;color:var(--cream);}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:49;}
+  @media(max-width:768px){
+    .sidebar{position:fixed;left:-100%;top:0;bottom:0;z-index:50;transition:left 0.3s;}
+    .sidebar.open{left:0;}
+    .sidebar-overlay.open{display:block;}
+    .mobile-header{display:flex;}
+    .main{width:100%;}
+    .stats-row{grid-template-columns:1fr 1fr;}
+    .form-row{grid-template-columns:1fr;}
+    .topbar{padding:0.75rem 1rem;}
+    .content{padding:1rem;}
+    th:nth-child(4),td:nth-child(4),th:nth-child(1),td:nth-child(1){display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">195 <span>Café</span></div>
+    <div class="login-sub">Management System</div>
+    <div class="form-group">
+      <div class="login-label">Password</div>
+      <input type="password" class="login-input" id="login-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error">Incorrect password. Try again.</div>
+    <div style="font-size:0.7rem;color:var(--brown-light);margin-top:1.25rem;">Default password: <strong>cafe195</strong></div>
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">195 <span>Café</span></div>
+      <div class="sidebar-brand-sub">Management System</div>
+    </div>
+    <div class="sidebar-section">Menu</div>
+    <div class="sidebar-item active" onclick="showView('products')"><span class="icon">☕</span> Products & Menu</div>
+    <div class="sidebar-item" onclick="showView('categories')"><span class="icon">📂</span> Categories</div>
+    <div class="sidebar-section">Coming Soon</div>
+    <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;"><span class="icon">🧾</span> Orders</div>
+    <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;"><span class="icon">📦</span> Inventory</div>
+    <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;"><span class="icon">🚚</span> Purchase Orders</div>
+    <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;"><span class="icon">💰</span> Finance</div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">⬅ Sign out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="mobile-header">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <span class="mobile-title">195 Café Admin</span>
+    </div>
+
+    <!-- PRODUCTS VIEW -->
+    <div id="view-products">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Products & Menu</div>
+          <div class="topbar-sub">Manage items in both English and Thai</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" onclick="exportMenu()">⬇ Export</button>
+          <button class="btn btn-primary" onclick="openAddModal()">+ Add Item</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-card-label">Total Items</div><div class="stat-card-val" id="stat-total">0</div><div class="stat-card-sub">menu items</div></div>
+          <div class="stat-card"><div class="stat-card-label">Available</div><div class="stat-card-val" id="stat-available">0</div><div class="stat-card-sub">in stock</div></div>
+          <div class="stat-card"><div class="stat-card-label">Sold Out</div><div class="stat-card-val" id="stat-soldout">0</div><div class="stat-card-sub">items</div></div>
+          <div class="stat-card"><div class="stat-card-label">Categories</div><div class="stat-card-val" id="stat-cats">0</div><div class="stat-card-sub">categories</div></div>
+        </div>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="search-input" placeholder="Search items…" oninput="renderTable()">
+          </div>
+          <select class="filter-select" id="status-filter" onchange="renderTable()">
+            <option value="all">All Status</option>
+            <option value="available">Available</option>
+            <option value="soldout">Sold Out</option>
+          </select>
+        </div>
+        <div class="cat-tabs" id="cat-tabs"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Photos</th>
+                <th>Item Name (EN / TH)</th>
+                <th>Category</th>
+                <th>Prices (Hot / Iced / Blend)</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="items-tbody"></tbody>
+          </table>
+          <div id="empty-state" class="empty-state" style="display:none;">
+            <div style="font-size:2.5rem;margin-bottom:0.75rem;">☕</div>
+            <p>No items found. Add your first menu item!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORIES VIEW -->
+    <div id="view-categories" style="display:none;">
+      <div class="topbar">
+        <div><div class="topbar-title">Categories</div><div class="topbar-sub">Each category has English & Thai names</div></div>
+        <div class="topbar-actions"><button class="btn btn-primary" onclick="openAddCatModal()">+ Add Category</button></div>
+      </div>
+      <div class="content">
+        <div class="table-wrap" style="padding:1rem;">
+          <div class="cat-list" id="cat-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ITEM MODAL -->
+<div class="modal-overlay" id="item-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Add Menu Item</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+
+      <!-- Bilingual Names -->
+      <div class="bilingual-group">
+        <div class="bilingual-group-title">📝 Item Name — กรอกชื่อเมนู</div>
+        <div class="form-row-2">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">English Name *</label>
+            <input type="text" class="form-input" id="f-name" placeholder="e.g. Latte">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Thai Name <span class="th-badge">ภาษาไทย</span></label>
+            <input type="text" class="form-input th-input" id="f-name-th" placeholder="เช่น ลาเต้">
+          </div>
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label class="form-label">Category *</label>
+        <select class="form-select" id="f-cat"></select>
+      </div>
+
+      <!-- Prices -->
+      <div class="form-group">
+        <label class="form-label">Prices (฿) — leave blank if not available</label>
+        <div class="form-row">
+          <div><input type="number" class="form-input" id="f-hot" placeholder="Hot"><div class="form-hint">🔥 Hot</div></div>
+          <div><input type="number" class="form-input" id="f-iced" placeholder="Iced"><div class="form-hint">🧊 Iced</div></div>
+          <div><input type="number" class="form-input" id="f-blend" placeholder="Blended"><div class="form-hint">🌀 Blended</div></div>
+        </div>
+      </div>
+
+      <!-- Bilingual Notes -->
+      <div class="bilingual-group">
+        <div class="bilingual-group-title">📋 Notes / Description — รายละเอียด</div>
+        <div class="form-group" style="margin-bottom:0.75rem;">
+          <label class="form-label">English Notes</label>
+          <textarea class="form-textarea" id="f-notes" placeholder="e.g. Add-ons available, seasonal item..."></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Thai Notes <span class="th-badge">ภาษาไทย</span></label>
+          <textarea class="form-textarea th-input" id="f-notes-th" placeholder="เช่น มีตัวเลือกเพิ่มเติม..."></textarea>
+        </div>
+      </div>
+
+      <!-- Photos -->
+      <div class="form-group">
+        <label class="form-label">Photos (up to 3)</label>
+        <div class="photo-upload-area" id="photo-upload-area"></div>
+        <div class="form-hint">Click a slot to upload. Max 2MB each.</div>
+      </div>
+
+      <!-- Available toggle -->
+      <div class="form-group">
+        <div class="toggle-wrap">
+          <label class="toggle"><input type="checkbox" id="f-available" checked><span class="toggle-slider"></span></label>
+          <span class="toggle-label">Available for sale</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal-overlay" id="cat-modal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">Add Category</div>
+      <button class="modal-close" onclick="closeCatModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="bilingual-group">
+        <div class="bilingual-group-title">📝 Category Name — ชื่อหมวดหมู่</div>
+        <div class="form-row-2">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">English *</label>
+            <input type="text" class="form-input" id="f-cat-name" placeholder="e.g. Coffee">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Thai <span class="th-badge">ภาษาไทย</span></label>
+            <input type="text" class="form-input th-input" id="f-cat-name-th" placeholder="เช่น กาแฟ">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Icon (emoji)</label>
+        <input type="text" class="form-input" id="f-cat-icon" placeholder="e.g. ☕" maxlength="4">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeCatModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCategory()">Add Category</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PASS = 'cafe195';
+const SK = { items:'cafe195_items', cats:'cafe195_cats', auth:'cafe195_auth' };
+function load(k){ try{ return JSON.parse(localStorage.getItem(k))||null; }catch{ return null; } }
+function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
+
+// Default data — full bilingual
+const DEFAULT_CATS = [
+  {id:'c1',name:'Coffee',nameTh:'กาแฟ',icon:'☕'},
+  {id:'c2',name:'Tea & Non-Coffee',nameTh:'ชาและเครื่องดื่มอื่น',icon:'🧋'},
+  {id:'c3',name:'Soda',nameTh:'โซดา',icon:'🍋'},
+  {id:'c4',name:'Special Drinks',nameTh:'เมนูพิเศษ',icon:'✨'},
+  {id:'c5',name:'Toast',nameTh:'ขนมปังปิ้ง',icon:'🍞'},
+];
+const DEFAULT_ITEMS = [
+  {id:'i1',name:'Espresso (Shot)',nameTh:'เอสเพรสโซ (ช็อต)',catId:'c1',hot:30,iced:null,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i2',name:'Espresso (Thai)',nameTh:'เอสเพรสโซ (ไทย)',catId:'c1',hot:null,iced:60,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i3',name:'Americano',nameTh:'อเมริกาโน่',catId:'c1',hot:40,iced:45,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i4',name:'Cappuccino',nameTh:'คาปูชิโน่',catId:'c1',hot:60,iced:65,blend:80,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i5',name:'Latte',nameTh:'ลาเต้',catId:'c1',hot:60,iced:65,blend:80,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i6',name:'Mocha',nameTh:'มอคค่า',catId:'c1',hot:60,iced:65,blend:80,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i7',name:'Caramel Macchiato',nameTh:'คาราเมล มัคคิอาโต้',catId:'c1',hot:null,iced:65,blend:80,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i8',name:'Orange Americano',nameTh:'อเมริกาโน่ ส้ม',catId:'c1',hot:null,iced:65,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i9',name:'Honey Americano',nameTh:'อเมริกาโน่ น้ำผึ้ง',catId:'c1',hot:null,iced:65,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i10',name:'Yuzu Americano',nameTh:'อเมริกาโน่ ยูซุ',catId:'c1',hot:null,iced:65,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i11',name:'Thai Tea',nameTh:'ชาไทย',catId:'c2',hot:40,iced:45,blend:60,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i12',name:'Cocoa',nameTh:'โกโก้',catId:'c2',hot:40,iced:45,blend:60,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i13',name:'Strawberry Milk',nameTh:'นมสตรอเบอร์รี่',catId:'c2',hot:40,iced:45,blend:60,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i14',name:'Ovaltine',nameTh:'โอวัลติน',catId:'c2',hot:50,iced:55,blend:70,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i15',name:'Red Lemonade Soda',nameTh:'น้ำแดงมะนาวโซดา',catId:'c3',hot:null,iced:50,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i16',name:'Honey Lemonade Soda',nameTh:'น้ำผึ้งมะนาวโซดา',catId:'c3',hot:null,iced:55,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i17',name:'Lemonade Soda',nameTh:'มะนาวโซดา',catId:'c3',hot:null,iced:50,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i18',name:'Strawberry Milk Choc',nameTh:'สตรอว์เบอร์รี่ มิลกี้ ช็อก',catId:'c4',hot:null,iced:80,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i19',name:'Oreo Cream Blast',nameTh:'โอริโอ ครีม บลาสต์',catId:'c4',hot:null,iced:80,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i20',name:'Triple Dark Malt',nameTh:'ทริปเปิ้ล ดาร์ก มอลต์',catId:'c4',hot:null,iced:null,blend:100,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i21',name:'Butter + Milk + Sugar',nameTh:'เนย + นม + น้ำตาล',catId:'c5',hot:25,iced:null,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i22',name:'Butter + Milk',nameTh:'เนย + นม',catId:'c5',hot:20,iced:null,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i23',name:'Butter + Sugar',nameTh:'เนย + น้ำตาล',catId:'c5',hot:20,iced:null,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i24',name:'Butter + Milk + Chocolate',nameTh:'เนย + นม + ช็อกโกแลต',catId:'c5',hot:30,iced:null,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+  {id:'i25',name:'Butter + Milk + Strawberry',nameTh:'เนย + นม + สตรอเบอร์รี่',catId:'c5',hot:30,iced:null,blend:null,notes:'',notesTh:'',available:true,photos:[]},
+];
+
+let items = load(SK.items) || DEFAULT_ITEMS;
+let cats  = load(SK.cats)  || DEFAULT_CATS;
+let activeCat = 'all';
+let currentPhotos = [];
+
+// ─── AUTH ────────────────────────────────────────────
+function doLogin(){
+  if(document.getElementById('login-pass').value===PASS){
+    save(SK.auth,true);
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').classList.add('visible');
+    renderAll();
+  } else {
+    document.getElementById('login-error').style.display='block';
+  }
+}
+function doLogout(){ save(SK.auth,false); location.reload(); }
+if(load(SK.auth)){ document.getElementById('login-screen').style.display='none'; document.getElementById('app').classList.add('visible'); }
+
+// ─── VIEWS ───────────────────────────────────────────
+function showView(v){
+  document.getElementById('view-products').style.display   = v==='products'   ? 'block':'none';
+  document.getElementById('view-categories').style.display = v==='categories' ? 'block':'none';
+  document.querySelectorAll('.sidebar-item').forEach((el,i)=>{
+    el.classList.toggle('active',(v==='products'&&i===0)||(v==='categories'&&i===1));
+  });
+  if(v==='categories') renderCatList();
+  closeSidebar();
+}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
+
+// ─── RENDER ──────────────────────────────────────────
+function renderAll(){ renderStats(); renderCatTabs(); renderTable(); renderCatSelects(); }
+
+function renderStats(){
+  document.getElementById('stat-total').textContent     = items.length;
+  document.getElementById('stat-available').textContent = items.filter(i=>i.available).length;
+  document.getElementById('stat-soldout').textContent   = items.filter(i=>!i.available).length;
+  document.getElementById('stat-cats').textContent      = cats.length;
+}
+
+function renderCatTabs(){
+  const wrap = document.getElementById('cat-tabs');
+  wrap.innerHTML = `<div class="cat-tab ${activeCat==='all'?'active':''}" onclick="setActiveCat('all')">All</div>`;
+  cats.forEach(c=>{
+    wrap.innerHTML += `<div class="cat-tab ${activeCat===c.id?'active':''}" onclick="setActiveCat('${c.id}')">${c.icon} ${c.name}<span style="font-family:'Sarabun',sans-serif;font-size:0.7rem;color:inherit;margin-left:4px;opacity:0.75;">${c.nameTh||''}</span></div>`;
+  });
+}
+function setActiveCat(id){ activeCat=id; renderCatTabs(); renderTable(); }
+
+function renderTable(){
+  const q      = document.getElementById('search-input').value.toLowerCase();
+  const status = document.getElementById('status-filter').value;
+  let filtered = items.filter(i=>{
+    const matchCat    = activeCat==='all'||i.catId===activeCat;
+    const matchSearch = i.name.toLowerCase().includes(q)||(i.nameTh||'').includes(q);
+    const matchStatus = status==='all'||(status==='available'&&i.available)||(status==='soldout'&&!i.available);
+    return matchCat&&matchSearch&&matchStatus;
+  });
+  const tbody = document.getElementById('items-tbody');
+  const empty = document.getElementById('empty-state');
+  if(!filtered.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = filtered.map(item=>{
+    const cat = cats.find(c=>c.id===item.catId);
+    const p = v => v ? `<span>${v}฿</span>` : `<span style="color:var(--brown-light)">—</span>`;
+    const photos = item.photos||[];
+    const thumbs = [0,1,2].map(i=>photos[i]
+      ? `<img class="thumb" src="${photos[i]}" alt="">`
+      : `<div class="thumb-empty">+</div>`
+    ).join('');
+    return `<tr>
+      <td><div class="thumb-strip">${thumbs}</div></td>
+      <td>
+        <div class="item-name">${item.name}</div>
+        <div class="item-name-th">${item.nameTh||'<span style="opacity:0.4;font-family:DM Sans,sans-serif;font-size:0.7rem;">no Thai name</span>'}</div>
+      </td>
+      <td>
+        <span class="item-cat">${cat?cat.icon+' '+cat.name:'—'}</span>
+        ${cat&&cat.nameTh?`<div style="font-size:0.68rem;color:var(--brown-light);font-family:'Sarabun',sans-serif;margin-top:2px;">${cat.nameTh}</div>`:''}
+      </td>
+      <td class="price-cell">${p(item.hot)} ${p(item.iced)} ${p(item.blend)}</td>
+      <td><span class="status-badge ${item.available?'status-available':'status-soldout'}">${item.available?'● Available':'● Sold Out'}</span></td>
+      <td>
+        <div class="actions">
+          <button class="btn btn-outline btn-sm" onclick="toggleAvailable('${item.id}')">${item.available?'Mark Sold Out':'Mark Available'}</button>
+          <button class="btn btn-outline btn-sm" onclick="openEditModal('${item.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('${item.id}')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCatSelects(){
+  const sel = document.getElementById('f-cat');
+  sel.innerHTML = cats.map(c=>`<option value="${c.id}">${c.icon} ${c.name} / ${c.nameTh||'—'}</option>`).join('');
+}
+
+function renderCatList(){
+  const list = document.getElementById('cat-list');
+  list.innerHTML = cats.map(c=>{
+    const count = items.filter(i=>i.catId===c.id).length;
+    return `<div class="cat-item">
+      <span style="font-size:1.2rem;">${c.icon}</span>
+      <div class="cat-item-name">
+        <div class="cat-item-name-en">${c.name}</div>
+        <div class="cat-item-name-th">${c.nameTh||'<span style="opacity:0.4;font-family:DM Sans,sans-serif;font-size:0.72rem;">no Thai name</span>'}</div>
+      </div>
+      <span class="cat-item-count">${count} item${count!==1?'s':''}</span>
+      <button class="btn btn-outline btn-sm" onclick="openEditCatModal('${c.id}')">Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCategory('${c.id}')">Delete</button>
+    </div>`;
+  }).join('')||'<p style="color:var(--brown-light);font-size:0.88rem;">No categories yet.</p>';
+}
+
+// ─── ITEM MODAL ──────────────────────────────────────
+function openAddModal(){
+  document.getElementById('modal-title').textContent = 'Add Menu Item';
+  document.getElementById('edit-id').value='';
+  ['f-name','f-name-th','f-hot','f-iced','f-blend','f-notes','f-notes-th'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-available').checked=true;
+  currentPhotos=[];
+  renderCatSelects();
+  renderPhotoSlots();
+  document.getElementById('item-modal').classList.add('open');
+}
+function openEditModal(id){
+  const item=items.find(i=>i.id===id); if(!item)return;
+  document.getElementById('modal-title').textContent='Edit Menu Item';
+  document.getElementById('edit-id').value=item.id;
+  document.getElementById('f-name').value=item.name;
+  document.getElementById('f-name-th').value=item.nameTh||'';
+  document.getElementById('f-hot').value=item.hot||'';
+  document.getElementById('f-iced').value=item.iced||'';
+  document.getElementById('f-blend').value=item.blend||'';
+  document.getElementById('f-notes').value=item.notes||'';
+  document.getElementById('f-notes-th').value=item.notesTh||'';
+  document.getElementById('f-available').checked=item.available;
+  currentPhotos=[...(item.photos||[])];
+  renderCatSelects();
+  document.getElementById('f-cat').value=item.catId;
+  renderPhotoSlots();
+  document.getElementById('item-modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('item-modal').classList.remove('open'); }
+
+function saveItem(){
+  const name=document.getElementById('f-name').value.trim();
+  const catId=document.getElementById('f-cat').value;
+  if(!name){ showToast('Please enter English item name','error'); return; }
+  if(!catId){ showToast('Please select a category','error'); return; }
+  const data={
+    name, nameTh:document.getElementById('f-name-th').value.trim(),
+    catId,
+    hot:  parseFloat(document.getElementById('f-hot').value)||null,
+    iced: parseFloat(document.getElementById('f-iced').value)||null,
+    blend:parseFloat(document.getElementById('f-blend').value)||null,
+    notes:document.getElementById('f-notes').value.trim(),
+    notesTh:document.getElementById('f-notes-th').value.trim(),
+    available:document.getElementById('f-available').checked,
+    photos:[...currentPhotos],
+  };
+  const editId=document.getElementById('edit-id').value;
+  if(editId){ items=items.map(i=>i.id===editId?{...i,...data}:i); showToast('Item updated ✓','success'); }
+  else { items.push({id:'i'+Date.now(),...data}); showToast('Item added ✓','success'); }
+  save(SK.items,items);
+  closeModal(); renderAll();
+}
+
+function deleteItem(id){
+  if(!confirm('Delete this item?')) return;
+  items=items.filter(i=>i.id!==id);
+  save(SK.items,items); renderAll(); showToast('Item deleted','error');
+}
+function toggleAvailable(id){
+  items=items.map(i=>i.id===id?{...i,available:!i.available}:i);
+  save(SK.items,items); renderAll();
+  const item=items.find(i=>i.id===id);
+  showToast(item.available?'Marked as Available ✓':'Marked as Sold Out',item.available?'success':'');
+}
+
+// ─── CATEGORY MODAL ──────────────────────────────────
+let editCatId = null;
+function openAddCatModal(){
+  editCatId=null;
+  document.querySelector('#cat-modal .modal-title').textContent='Add Category';
+  document.getElementById('f-cat-name').value='';
+  document.getElementById('f-cat-name-th').value='';
+  document.getElementById('f-cat-icon').value='';
+  document.getElementById('cat-modal').classList.add('open');
+}
+function openEditCatModal(id){
+  const cat=cats.find(c=>c.id===id); if(!cat)return;
+  editCatId=id;
+  document.querySelector('#cat-modal .modal-title').textContent='Edit Category';
+  document.getElementById('f-cat-name').value=cat.name;
+  document.getElementById('f-cat-name-th').value=cat.nameTh||'';
+  document.getElementById('f-cat-icon').value=cat.icon||'';
+  document.getElementById('cat-modal').classList.add('open');
+}
+function closeCatModal(){ document.getElementById('cat-modal').classList.remove('open'); }
+function saveCategory(){
+  const name=document.getElementById('f-cat-name').value.trim();
+  const nameTh=document.getElementById('f-cat-name-th').value.trim();
+  const icon=document.getElementById('f-cat-icon').value.trim()||'📋';
+  if(!name){ showToast('Please enter English category name','error'); return; }
+  if(editCatId){
+    cats=cats.map(c=>c.id===editCatId?{...c,name,nameTh,icon}:c);
+    showToast('Category updated ✓','success');
+  } else {
+    cats.push({id:'c'+Date.now(),name,nameTh,icon});
+    showToast('Category added ✓','success');
+  }
+  save(SK.cats,cats); closeCatModal(); renderAll(); renderCatList();
+}
+function deleteCategory(id){
+  const count=items.filter(i=>i.catId===id).length;
+  if(count>0){ showToast(`Cannot delete — ${count} item(s) use this category`,'error'); return; }
+  if(!confirm('Delete this category?')) return;
+  cats=cats.filter(c=>c.id!==id);
+  save(SK.cats,cats); renderAll(); renderCatList();
+  showToast('Category deleted','error');
+}
+
+// ─── PHOTOS ──────────────────────────────────────────
+function renderPhotoSlots(){
+  const area=document.getElementById('photo-upload-area');
+  area.innerHTML='';
+  for(let i=0;i<3;i++){
+    const slot=document.createElement('div');
+    slot.className='photo-slot';
+    if(currentPhotos[i]){
+      slot.innerHTML=`<img src="${currentPhotos[i]}" alt="photo ${i+1}"><button class="photo-slot-remove" onclick="removePhoto(${i},event)" title="Remove">✕</button>`;
+    } else {
+      slot.innerHTML=`<span class="photo-slot-icon">📷</span><span class="photo-slot-label">Photo ${i+1}</span><input type="file" accept="image/*" onchange="handlePhotoUpload(${i},this)">`;
+      slot.onclick=()=>slot.querySelector('input[type=file]').click();
+    }
+    area.appendChild(slot);
+  }
+}
+function handlePhotoUpload(index,input){
+  const file=input.files[0]; if(!file)return;
+  if(file.size>2*1024*1024){ showToast('Photo too large — max 2MB','error'); return; }
+  const reader=new FileReader();
+  reader.onload=e=>{ currentPhotos[index]=e.target.result; renderPhotoSlots(); showToast(`Photo ${index+1} added ✓`,'success'); };
+  reader.readAsDataURL(file);
+}
+function removePhoto(index,event){
+  event.stopPropagation();
+  currentPhotos.splice(index,1);
+  renderPhotoSlots();
+  showToast('Photo removed','');
+}
+
+// ─── EXPORT ──────────────────────────────────────────
+function exportMenu(){
+  let csv='Name (EN),Name (TH),Category,Hot,Iced,Blended,Status,Notes (EN),Notes (TH)\n';
+  items.forEach(i=>{
+    const cat=cats.find(c=>c.id===i.catId);
+    csv+=`"${i.name}","${i.nameTh||''}","${cat?cat.name:''}","${i.hot||''}","${i.iced||''}","${i.blend||''}","${i.available?'Available':'Sold Out'}","${i.notes||''}","${i.notesTh||''}"\n`;
+  });
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='195cafe-menu.csv'; a.click();
+  showToast('Menu exported ✓','success');
+}
+
+// ─── TOAST ───────────────────────────────────────────
+let toastTimer;
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.className='toast',2800);
+}
+
+// ─── INIT ────────────────────────────────────────────
+if(load(SK.auth)) renderAll();
+</script>
+</body>
+</html>
