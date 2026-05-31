@@ -189,9 +189,11 @@ tr.clickable-row:hover td{background:rgba(200,168,130,0.07);}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SK = { orders:'cafe195_orders' };
-const load = k => { try{ return JSON.parse(localStorage.getItem(k))||null; }catch{ return null; } };
+const SB_URL = 'https://nczopypmbybjvkxqpxgy.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jem9weXBtYnlianZreHFweGd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMjk3OTcsImV4cCI6MjA5NTgwNTc5N30.IpwzundkVF8nklpGmMnRRQZphe2T72qgWh5liDYxU4E';
+const db = supabase.createClient(SB_URL, SB_KEY);
 
 let period   = 'today';
 let fromDate = null, toDate = null;
@@ -238,8 +240,9 @@ function fmtDate(d) {
        + ' ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 }
 
-function render() {
-  const orders = load(SK.orders) || [];
+async function render() {
+  const { data: orders, error } = await db.from('orders').select('*');
+  if(error){ console.error(error); return; }
   const range  = getRange();
   const filtered = orders.filter(o=>{ const d=new Date(o.timestamp); return d>=range.from && d<=range.to; });
 

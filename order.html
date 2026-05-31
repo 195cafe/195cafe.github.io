@@ -356,11 +356,12 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ══ STORAGE ══
-const SK = { items:'cafe195_items', cats:'cafe195_cats', orders:'cafe195_orders', counter:'cafe195_order_counter' };
-const load = k => { try{ return JSON.parse(localStorage.getItem(k))||null; }catch{ return null; } };
-const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+// ══ SUPABASE ══
+const SB_URL = 'https://nczopypmbybjvkxqpxgy.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jem9weXBtYnlianZreHFweGd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMjk3OTcsImV4cCI6MjA5NTgwNTc5N30.IpwzundkVF8nklpGmMnRRQZphe2T72qgWh5liDYxU4E';
+const db = supabase.createClient(SB_URL, SB_KEY);
 
 // ══ STATE ══
 let menuItems = [], cats = [], orders = [];
@@ -368,30 +369,44 @@ let cart = [], activeCat = 'all';
 let editingOrderId = null, currentDetailId = null;
 
 // ══ ORDER NUMBER ══
-function genOrderNumber() {
+async function genOrderNumber() {
   const now = new Date();
   const prefix = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}`;
-  let c = load(SK.counter) || { prefix:'', last:0 };
-  if(c.prefix !== prefix) c = { prefix, last:0 };
-  c.last++;
-  save(SK.counter, c);
-  return prefix + String(c.last).padStart(4,'0');
+  // Upsert counter row, incrementing last
+  const { data, error } = await db.rpc('increment_order_counter', { p_prefix: prefix });
+  if(error || !data) {
+    // Fallback: read then update manually
+    const { data: row } = await db.from('order_counter').select('last').eq('prefix', prefix).maybeSingle();
+    const next = (row?.last || 0) + 1;
+    await db.from('order_counter').upsert({ prefix, last: next });
+    return prefix + String(next).padStart(4,'0');
+  }
+  return prefix + String(data).padStart(4,'0');
 }
 
 // ══ ROUTER ══
 function navigate(path) { window.location.hash = path; }
 
-function handleRoute() {
-  menuItems = load(SK.items) || [];
-  cats      = load(SK.cats)  || [];
-  orders    = load(SK.orders)|| [];
+async function loadData() {
+  const [catsRes, itemsRes, ordersRes] = await Promise.all([
+    db.from('categories').select('*').order('sort_order'),
+    db.from('menu_items').select('*'),
+    db.from('orders').select('*').order('timestamp', { ascending: false }),
+  ]);
+  cats      = (catsRes.data||[]).map(c=>({...c, nameTh:c.name_th}));
+  menuItems = (itemsRes.data||[]).map(i=>({...i, nameTh:i.name_th, notesTh:i.notes_th, catId:i.cat_id, photos:i.photos||[]}));
+  orders    = ordersRes.data||[];
+}
 
+async function handleRoute() {
   const hash = window.location.hash.slice(1) || 'list';
   const [view, param] = hash.split('/');
 
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
   document.getElementById('sb-orders').classList.add('active');
+
+  await loadData();
 
   if(view === 'list' || view === '') {
     document.getElementById('view-list').classList.add('active');
@@ -610,30 +625,32 @@ function setPayment(method) {
 }
 
 // ══ SAVE ══
-function saveOrder() {
+async function saveOrder() {
   if(!cart.length){ showToast('Add at least one item','error'); return; }
   const payment = document.getElementById('form-payment').value.trim();
   if(!payment){ showToast('Please enter a payment method','error'); return; }
 
   const isEdit = !!editingOrderId;
   const existingOrder = isEdit ? orders.find(o=>o.id===editingOrderId) : null;
+  const orderId = isEdit ? editingOrderId : await genOrderNumber();
 
   const orderData = {
-    id:        isEdit ? editingOrderId : genOrderNumber(),
+    id:        orderId,
     timestamp: isEdit ? existingOrder.timestamp : new Date().toISOString(),
     items:     cart.map(c=>({ itemId:c.itemId, name:c.name, type:c.type, price:c.price, qty:c.qty, sweetness:c.sweetness, note:c.note })),
     total:     getTotal(),
     payment,
   };
 
-  if(isEdit) {
-    orders = orders.map(o=>o.id===editingOrderId ? orderData : o);
-    showToast(`Order ${orderData.id} updated ✓`, 'success');
+  let error;
+  if(isEdit){
+    ({error} = await db.from('orders').update(orderData).eq('id', editingOrderId));
+    if(!error) showToast(`Order ${orderId} updated ✓`, 'success');
   } else {
-    orders.push(orderData);
-    showToast(`Order ${orderData.id} saved ✓`, 'success');
+    ({error} = await db.from('orders').insert(orderData));
+    if(!error) showToast(`Order ${orderId} saved ✓`, 'success');
   }
-  save(SK.orders, orders);
+  if(error){ showToast('Error: '+error.message, 'error'); return; }
   navigate('list');
 }
 
@@ -666,10 +683,10 @@ function renderDetail(order) {
 function editCurrentOrder()   { if(currentDetailId) navigate(`edit/${currentDetailId}`); }
 function deleteCurrentOrder() { if(currentDetailId) deleteOrder(currentDetailId); }
 
-function deleteOrder(id) {
+async function deleteOrder(id) {
   if(!confirm(`Delete order ${id}? This cannot be undone.`)) return;
-  orders = orders.filter(o=>o.id!==id);
-  save(SK.orders, orders);
+  const {error} = await db.from('orders').delete().eq('id', id);
+  if(error){ showToast('Error: '+error.message,'error'); return; }
   showToast('Order deleted','error');
   navigate('list');
 }
