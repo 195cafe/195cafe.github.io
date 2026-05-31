@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>195 Café — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#F7F0E6;--warm-white:#FDF9F4;--brown-light:#C8A882;--brown-mid:#9B7355;--brown-dark:#5C3D1E;--espresso:#2C1A0E;--gold:#D4A853;--text-body:#4A3728;--success:#2D6A4F;--success-bg:#D8F3DC;--danger:#9B2226;--danger-bg:#FFE8E8;--sidebar-w:240px;}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text-body);}
+
+  #app{display:flex;height:100vh;overflow:hidden;}
+  .sidebar{width:var(--sidebar-w);background:var(--espresso);color:var(--cream);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+  .sidebar-brand{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+  .sidebar-brand-name{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:600;color:var(--cream);}
+  .sidebar-brand-name span{color:var(--brown-light);}
+  .sidebar-brand-sub{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,240,230,0.35);margin-top:2px;}
+  .sidebar-section{padding:1rem 0.75rem 0.5rem;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,240,230,0.3);}
+  .sidebar-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1.25rem;font-size:0.85rem;color:rgba(247,240,230,0.65);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;text-decoration:none;}
+  .sidebar-item:hover{background:rgba(255,255,255,0.06);color:var(--cream);}
+  .sidebar-item.active{background:rgba(200,168,130,0.15);color:var(--cream);border-left-color:var(--brown-light);}
+  .sidebar-item .icon{font-size:1rem;width:20px;text-align:center;}
+  .sidebar-footer{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08);}
+  .logout-btn{font-size:0.75rem;color:rgba(247,240,230,0.4);cursor:pointer;background:none;border:none;font-family:"DM Sans",sans-serif;display:flex;align-items:center;gap:0.5rem;}
+  .logout-btn:hover{color:var(--brown-light);}
+
+  .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+  .topbar{background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:1.25rem 2rem;position:sticky;top:0;z-index:10;}
+  .topbar-title{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:500;color:var(--espresso);}
+  .topbar-sub{font-size:0.75rem;color:var(--brown-light);margin-top:2px;}
+  .content{padding:1.5rem 2rem;flex:1;}
+
+  /* FILTER BAR */
+  .filter-bar{display:flex;gap:0.6rem;margin-bottom:2rem;flex-wrap:wrap;align-items:center;}
+  .period-btn{padding:0.5rem 1.1rem;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;border:1.5px solid rgba(200,168,130,0.3);background:var(--warm-white);color:var(--brown-mid);transition:all 0.15s;font-family:"DM Sans",sans-serif;}
+  .period-btn:hover,.period-btn.active{background:var(--brown-dark);color:var(--cream);border-color:var(--brown-dark);}
+  .date-inputs{display:flex;gap:0.5rem;align-items:center;}
+  .date-input{padding:0.48rem 0.8rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.8rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--text-body);outline:none;cursor:pointer;}
+  .date-input:focus{border-color:var(--brown-mid);}
+  .date-sep{font-size:0.8rem;color:var(--brown-light);}
+  .apply-btn{padding:0.5rem 1rem;border-radius:8px;background:var(--brown-dark);color:var(--cream);border:none;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;}
+  .apply-btn:hover{background:var(--espresso);}
+  .period-label{font-size:0.75rem;color:var(--brown-light);margin-left:0.25rem;}
+
+  /* STAT CARDS */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+  .stat-card{background:var(--warm-white);border-radius:14px;padding:1.25rem 1.5rem;border:1px solid rgba(200,168,130,0.2);}
+  .stat-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--brown-light);margin-bottom:0.5rem;}
+  .stat-val{font-family:"Cormorant Garamond",serif;font-size:2.2rem;font-weight:500;color:var(--espresso);line-height:1;}
+  .stat-sub{font-size:0.75rem;color:var(--brown-mid);margin-top:5px;}
+
+  /* PAYMENT SPLIT */
+  .section-title{font-family:"Cormorant Garamond",serif;font-size:1.2rem;font-weight:500;color:var(--espresso);margin-bottom:1rem;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2rem;}
+  .panel{background:var(--warm-white);border-radius:14px;padding:1.5rem;border:1px solid rgba(200,168,130,0.2);}
+  .payment-row{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid rgba(200,168,130,0.12);}
+  .payment-row:last-child{border-bottom:none;}
+  .payment-row-label{display:flex;align-items:center;gap:0.6rem;font-size:0.88rem;font-weight:500;color:var(--espresso);}
+  .payment-row-bar-wrap{flex:1;margin:0 1rem;height:6px;background:rgba(200,168,130,0.2);border-radius:3px;overflow:hidden;}
+  .payment-row-bar{height:100%;background:var(--brown-mid);border-radius:3px;transition:width 0.4s ease;}
+  .payment-row-val{font-size:0.88rem;font-weight:500;color:var(--espresso);min-width:60px;text-align:right;}
+  .payment-row-count{font-size:0.72rem;color:var(--brown-light);min-width:50px;text-align:right;}
+
+  /* TOP ITEMS */
+  .top-item-row{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 0;border-bottom:1px solid rgba(200,168,130,0.1);}
+  .top-item-row:last-child{border-bottom:none;}
+  .top-item-rank{font-family:"Cormorant Garamond",serif;font-size:1.1rem;color:var(--brown-light);min-width:24px;}
+  .top-item-name{flex:1;font-size:0.88rem;font-weight:500;color:var(--espresso);}
+  .top-item-qty{font-size:0.78rem;color:var(--brown-mid);min-width:50px;text-align:right;}
+  .top-item-rev{font-size:0.88rem;font-weight:500;color:var(--espresso);min-width:64px;text-align:right;}
+
+  /* RECENT ORDERS */
+  .table-wrap{background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);overflow:hidden;margin-bottom:2rem;}
+  table{width:100%;border-collapse:collapse;}
+  thead{background:rgba(92,61,30,0.05);}
+  th{padding:0.75rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);font-weight:500;}
+  td{padding:0.8rem 1rem;font-size:0.85rem;border-top:1px solid rgba(200,168,130,0.12);vertical-align:middle;}
+  tr:hover td{background:rgba(200,168,130,0.04);}
+  .order-id-cell{font-family:"Cormorant Garamond",serif;font-size:1rem;font-weight:500;color:var(--espresso);}
+  .payment-badge{display:inline-flex;align-items:center;font-size:0.72rem;padding:3px 10px;border-radius:10px;font-weight:500;background:rgba(200,168,130,0.15);color:var(--brown-mid);}
+  .empty-state{text-align:center;padding:3rem;color:var(--brown-light);font-size:0.88rem;}
+
+  @media(max-width:900px){
+    .stats-grid{grid-template-columns:1fr 1fr;}
+    .two-col{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">195 <span>Café</span></div>
+      <div class="sidebar-brand-sub">Management System</div>
+    </div>
+    <div class="sidebar-section">Orders</div>
+    <a class="sidebar-item" href="order.html"><span class="icon">📋</span> New Order</a>
+    <a class="sidebar-item" href="order.html"><span class="icon">🧾</span> Order History</a>
+    <div class="sidebar-section">Menu</div>
+    <a class="sidebar-item" href="menu-admin.html"><span class="icon">☕</span> Products & Menu</a>
+    <div class="sidebar-section">Reports</div>
+    <div class="sidebar-item active"><span class="icon">📊</span> Dashboard</div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="window.location.href='menu-admin.html'">⬅ Back to Admin</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-sub" id="topbar-period-label">Today's summary</div>
+    </div>
+    <div class="content">
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <button class="period-btn active" data-period="today"    onclick="setPeriod('today')">Today</button>
+        <button class="period-btn"        data-period="week"     onclick="setPeriod('week')">This Week</button>
+        <button class="period-btn"        data-period="month"    onclick="setPeriod('month')">This Month</button>
+        <button class="period-btn"        data-period="custom"   onclick="setPeriod('custom')">Custom Range</button>
+        <div class="date-inputs" id="custom-inputs" style="display:none;">
+          <input type="date" class="date-input" id="date-from">
+          <span class="date-sep">→</span>
+          <input type="date" class="date-input" id="date-to">
+          <button class="apply-btn" onclick="applyCustom()">Apply</button>
+        </div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-val" id="stat-revenue">฿0</div>
+          <div class="stat-sub" id="stat-revenue-sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Orders</div>
+          <div class="stat-val" id="stat-orders">0</div>
+          <div class="stat-sub" id="stat-orders-sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg. Order Value</div>
+          <div class="stat-val" id="stat-avg">฿0</div>
+          <div class="stat-sub">per order</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Items Sold</div>
+          <div class="stat-val" id="stat-items">0</div>
+          <div class="stat-sub">total items</div>
+        </div>
+      </div>
+
+      <!-- PAYMENT SPLIT + TOP ITEMS -->
+      <div class="two-col">
+        <div class="panel">
+          <div class="section-title">Payment Breakdown</div>
+          <div id="payment-breakdown"><div class="empty-state">No orders yet</div></div>
+        </div>
+        <div class="panel">
+          <div class="section-title">Top Items</div>
+          <div id="top-items"><div class="empty-state">No orders yet</div></div>
+        </div>
+      </div>
+
+      <!-- RECENT ORDERS -->
+      <div class="section-title">Orders in Period</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Date & Time</th>
+              <th>Items</th>
+              <th>Payment</th>
+              <th style="text-align:right;">Total</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody"></tbody>
+        </table>
+        <div id="orders-empty" class="empty-state">No orders in this period</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const SK = { orders:'cafe195_orders' };
+function load(k){ try{ return JSON.parse(localStorage.getItem(k))||null; }catch{ return null; } }
+
+let orders  = load(SK.orders) || [];
+let period  = 'today';
+let fromDate = null, toDate = null;
+
+// ─── PERIOD ───────────────────────────────────────────
+function setPeriod(p){
+  period = p;
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.toggle('active',b.dataset.period===p));
+  document.getElementById('custom-inputs').style.display = p==='custom' ? 'flex' : 'none';
+  if(p!=='custom') renderDashboard();
+}
+
+function applyCustom(){
+  fromDate = document.getElementById('date-from').value;
+  toDate   = document.getElementById('date-to').value;
+  if(!fromDate||!toDate){ alert('Please select both dates'); return; }
+  renderDashboard();
+}
+
+function getDateRange(){
+  const now   = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if(period==='today')  return { from: today, to: new Date(today.getTime()+86400000-1) };
+  if(period==='week'){
+    const ws = new Date(today); ws.setDate(today.getDate()-today.getDay());
+    return { from: ws, to: new Date(ws.getTime()+7*86400000-1) };
+  }
+  if(period==='month'){
+    const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+    const me = new Date(now.getFullYear(), now.getMonth()+1, 0, 23, 59, 59);
+    return { from: ms, to: me };
+  }
+  if(period==='custom' && fromDate && toDate){
+    return { from: new Date(fromDate), to: new Date(toDate+'T23:59:59') };
+  }
+  return { from: today, to: new Date(today.getTime()+86400000-1) };
+}
+
+function getPeriodLabel(){
+  if(period==='today')  return "Today's summary";
+  if(period==='week')   return "This week's summary";
+  if(period==='month')  return "This month's summary";
+  if(period==='custom' && fromDate && toDate) return `${fromDate} → ${toDate}`;
+  return 'Summary';
+}
+
+// ─── RENDER ───────────────────────────────────────────
+function renderDashboard(){
+  orders = load(SK.orders) || [];
+  const range = getDateRange();
+  const filtered = orders.filter(o=>{
+    const d = new Date(o.timestamp);
+    return d >= range.from && d <= range.to;
+  });
+
+  document.getElementById('topbar-period-label').textContent = getPeriodLabel();
+
+  // Stats
+  const total   = filtered.reduce((s,o)=>s+o.total, 0);
+  const count   = filtered.length;
+  const avg     = count ? Math.round(total/count) : 0;
+  const itemQty = filtered.reduce((s,o)=>s+o.items.reduce((q,i)=>q+i.qty,0), 0);
+
+  document.getElementById('stat-revenue').textContent = '฿'+total.toLocaleString();
+  document.getElementById('stat-revenue-sub').textContent = count ? `from ${count} order${count!==1?'s':''}` : 'no orders';
+  document.getElementById('stat-orders').textContent   = count;
+  document.getElementById('stat-orders-sub').textContent = count ? `${itemQty} items sold` : '';
+  document.getElementById('stat-avg').textContent      = '฿'+avg;
+  document.getElementById('stat-items').textContent    = itemQty;
+
+  // Payment breakdown
+  const payMap = {};
+  filtered.forEach(o=>{
+    payMap[o.payment] = payMap[o.payment] || {count:0,total:0};
+    payMap[o.payment].count++;
+    payMap[o.payment].total += o.total;
+  });
+  const payEntries = Object.entries(payMap).sort((a,b)=>b[1].total-a[1].total);
+  const payEl = document.getElementById('payment-breakdown');
+  if(!payEntries.length){ payEl.innerHTML='<div class="empty-state">No orders yet</div>'; }
+  else {
+    payEl.innerHTML = payEntries.map(([method, data])=>{
+      const pct = total ? Math.round(data.total/total*100) : 0;
+      return `<div class="payment-row">
+        <div class="payment-row-label">
+          <span>${method==='Cash'?'💵':method==='QR Code'?'📱':'💳'}</span>
+          <span>${method}</span>
+        </div>
+        <div class="payment-row-bar-wrap"><div class="payment-row-bar" style="width:${pct}%"></div></div>
+        <div class="payment-row-count">${data.count} orders</div>
+        <div class="payment-row-val">฿${data.total.toLocaleString()}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Top items
+  const itemMap = {};
+  filtered.forEach(o=>o.items.forEach(i=>{
+    const key = `${i.name} (${i.type})`;
+    itemMap[key] = itemMap[key] || {qty:0,revenue:0};
+    itemMap[key].qty     += i.qty;
+    itemMap[key].revenue += i.price * i.qty;
+  }));
+  const topItems = Object.entries(itemMap).sort((a,b)=>b[1].qty-a[1].qty).slice(0,8);
+  const topEl = document.getElementById('top-items');
+  if(!topItems.length){ topEl.innerHTML='<div class="empty-state">No orders yet</div>'; }
+  else {
+    topEl.innerHTML = topItems.map(([name,data],i)=>`
+      <div class="top-item-row">
+        <div class="top-item-rank">#${i+1}</div>
+        <div class="top-item-name">${name}</div>
+        <div class="top-item-qty">${data.qty} sold</div>
+        <div class="top-item-rev">฿${data.revenue.toLocaleString()}</div>
+      </div>
+    `).join('');
+  }
+
+  // Orders table
+  const tbody = document.getElementById('orders-tbody');
+  const empty = document.getElementById('orders-empty');
+  const sorted = [...filtered].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+  if(!sorted.length){ tbody.innerHTML=''; empty.style.display='block'; }
+  else {
+    empty.style.display='none';
+    tbody.innerHTML = sorted.map(o=>{
+      const d = new Date(o.timestamp);
+      const dateStr = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+      const timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      const summary = o.items.map(i=>`${i.name} ×${i.qty}`).join(', ');
+      return `<tr>
+        <td class="order-id-cell">${o.id}</td>
+        <td style="white-space:nowrap;">${dateStr}<br><span style="font-size:0.75rem;color:var(--brown-light);">${timeStr}</span></td>
+        <td style="font-size:0.78rem;color:var(--brown-mid);">${summary}</td>
+        <td><span class="payment-badge">${o.payment}</span></td>
+        <td style="text-align:right;font-weight:500;color:var(--espresso);">฿${o.total}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+// ─── INIT ────────────────────────────────────────────
+// Default custom date range to today
+const today = new Date().toISOString().slice(0,10);
+document.getElementById('date-from').value = today;
+document.getElementById('date-to').value   = today;
+renderDashboard();
+</script>
+</body>
+</html>

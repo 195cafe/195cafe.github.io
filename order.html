@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>195 Café — Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#F7F0E6;--warm-white:#FDF9F4;--brown-light:#C8A882;--brown-mid:#9B7355;--brown-dark:#5C3D1E;--espresso:#2C1A0E;--gold:#D4A853;--text-body:#4A3728;--success:#2D6A4F;--success-bg:#D8F3DC;--danger:#9B2226;--danger-bg:#FFE8E8;--sidebar-w:240px;}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text-body);}
+
+  /* LAYOUT */
+  #app{display:flex;height:100vh;overflow:hidden;}
+  .sidebar{width:var(--sidebar-w);background:var(--espresso);color:var(--cream);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+  .sidebar-brand{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+  .sidebar-brand-name{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:600;color:var(--cream);}
+  .sidebar-brand-name span{color:var(--brown-light);}
+  .sidebar-brand-sub{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,240,230,0.35);margin-top:2px;}
+  .sidebar-section{padding:1rem 0.75rem 0.5rem;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,240,230,0.3);}
+  .sidebar-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1.25rem;font-size:0.85rem;color:rgba(247,240,230,0.65);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;text-decoration:none;}
+  .sidebar-item:hover{background:rgba(255,255,255,0.06);color:var(--cream);}
+  .sidebar-item.active{background:rgba(200,168,130,0.15);color:var(--cream);border-left-color:var(--brown-light);}
+  .sidebar-item .icon{font-size:1rem;width:20px;text-align:center;}
+  .sidebar-footer{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08);}
+  .logout-btn{font-size:0.75rem;color:rgba(247,240,230,0.4);cursor:pointer;background:none;border:none;font-family:"DM Sans",sans-serif;display:flex;align-items:center;gap:0.5rem;}
+  .logout-btn:hover{color:var(--brown-light);}
+
+  .main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+
+  /* TAB NAV */
+  .tab-nav{background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);display:flex;align-items:center;padding:0 2rem;gap:0;}
+  .tab-btn{padding:1rem 1.5rem;font-size:0.82rem;font-weight:500;color:var(--brown-mid);cursor:pointer;border:none;background:transparent;border-bottom:2.5px solid transparent;transition:all 0.2s;font-family:"DM Sans",sans-serif;display:flex;align-items:center;gap:0.4rem;}
+  .tab-btn:hover{color:var(--brown-dark);}
+  .tab-btn.active{color:var(--brown-dark);border-bottom-color:var(--brown-dark);}
+
+  /* VIEWS */
+  .view{display:none;flex:1;overflow:hidden;}
+  .view.active{display:flex;}
+
+  /* ── NEW ORDER VIEW ── */
+  .order-layout{display:grid;grid-template-columns:1fr 380px;flex:1;overflow:hidden;}
+  .menu-panel{overflow-y:auto;padding:1.5rem;border-right:1px solid rgba(200,168,130,0.2);}
+  .order-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--warm-white);}
+
+  /* Order number header */
+  .order-header{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(200,168,130,0.15);display:flex;align-items:center;justify-content:space-between;}
+  .order-num{font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:500;color:var(--espresso);}
+  .order-num-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--brown-light);}
+  .new-order-btn{padding:0.4rem 0.9rem;border-radius:8px;font-size:0.75rem;font-weight:500;cursor:pointer;border:1.5px solid rgba(92,61,30,0.25);background:transparent;color:var(--brown-dark);font-family:"DM Sans",sans-serif;transition:all 0.15s;}
+  .new-order-btn:hover{background:var(--brown-dark);color:var(--cream);border-color:var(--brown-dark);}
+
+  /* Cart */
+  .cart-items{flex:1;overflow-y:auto;padding:1rem 1.5rem;}
+  .cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--brown-light);gap:0.5rem;}
+  .cart-empty-icon{font-size:2.5rem;opacity:0.3;}
+  .cart-empty-text{font-size:0.85rem;}
+  .cart-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid rgba(200,168,130,0.12);}
+  .cart-item-name{flex:1;font-size:0.88rem;color:var(--espresso);font-weight:500;}
+  .cart-item-price{font-size:0.82rem;color:var(--brown-mid);margin-top:2px;}
+  .qty-ctrl{display:flex;align-items:center;gap:0.4rem;}
+  .qty-btn{width:26px;height:26px;border-radius:6px;border:1.5px solid rgba(200,168,130,0.4);background:transparent;color:var(--brown-dark);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+  .qty-btn:hover{background:var(--brown-dark);color:var(--cream);border-color:var(--brown-dark);}
+  .qty-num{font-size:0.88rem;font-weight:500;min-width:22px;text-align:center;color:var(--espresso);}
+  .cart-item-total{font-size:0.9rem;font-weight:500;color:var(--espresso);min-width:50px;text-align:right;}
+  .remove-btn{background:none;border:none;color:var(--brown-light);cursor:pointer;font-size:1rem;padding:2px;transition:color 0.15s;}
+  .remove-btn:hover{color:var(--danger);}
+
+  /* Cart footer */
+  .cart-footer{padding:1.25rem 1.5rem;border-top:1px solid rgba(200,168,130,0.2);}
+  .cart-total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem;}
+  .cart-total-label{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);}
+  .cart-total-val{font-family:"Cormorant Garamond",serif;font-size:2rem;font-weight:500;color:var(--espresso);}
+  .payment-group{margin-bottom:1rem;}
+  .payment-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);margin-bottom:0.5rem;display:block;}
+  .payment-quick{display:flex;gap:0.5rem;margin-bottom:0.5rem;}
+  .payment-quick-btn{flex:1;padding:0.45rem 0.6rem;border-radius:8px;border:1.5px solid rgba(200,168,130,0.35);background:transparent;color:var(--brown-mid);font-size:0.78rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all 0.15s;}
+  .payment-quick-btn:hover,.payment-quick-btn.active{background:var(--brown-dark);color:var(--cream);border-color:var(--brown-dark);}
+  .payment-input{width:100%;padding:0.6rem 0.9rem;border:1.5px solid rgba(200,168,130,0.35);border-radius:8px;font-size:0.88rem;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--espresso);outline:none;transition:border-color 0.2s;}
+  .payment-input:focus{border-color:var(--brown-mid);}
+  .complete-btn{width:100%;padding:0.9rem;background:var(--brown-dark);color:var(--cream);border:none;border-radius:10px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;letter-spacing:0.05em;transition:background 0.2s;}
+  .complete-btn:hover{background:var(--espresso);}
+  .complete-btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+  /* Menu items */
+  .cat-tabs{display:flex;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .cat-tab{padding:0.4rem 1rem;border-radius:20px;font-size:0.78rem;font-weight:500;cursor:pointer;border:1.5px solid rgba(200,168,130,0.3);background:var(--warm-white);color:var(--brown-mid);transition:all 0.15s;}
+  .cat-tab.active,.cat-tab:hover{background:var(--brown-dark);color:var(--cream);border-color:var(--brown-dark);}
+  .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem;}
+  .menu-item-card{background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);padding:0.9rem;cursor:pointer;transition:all 0.2s;}
+  .menu-item-card:hover{border-color:var(--brown-mid);transform:translateY(-1px);box-shadow:0 4px 16px rgba(92,61,30,0.1);}
+  .menu-item-card.unavailable{opacity:0.4;cursor:not-allowed;}
+  .menu-card-name{font-size:0.88rem;font-weight:500;color:var(--espresso);margin-bottom:0.25rem;line-height:1.3;}
+  .menu-card-cat{font-size:0.68rem;color:var(--brown-light);margin-bottom:0.5rem;}
+  .menu-card-prices{display:flex;gap:0.4rem;flex-wrap:wrap;}
+  .price-chip{font-size:0.72rem;padding:2px 8px;border-radius:6px;background:var(--cream);color:var(--brown-dark);cursor:pointer;border:1px solid rgba(200,168,130,0.3);transition:all 0.15s;}
+  .price-chip:hover{background:var(--brown-dark);color:var(--cream);}
+
+  /* ── ORDER HISTORY VIEW ── */
+  .history-layout{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+  .history-toolbar{padding:1.25rem 2rem;background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;}
+  .search-wrap{position:relative;flex:1;min-width:200px;}
+  .search-icon{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--brown-light);font-size:0.9rem;}
+  .search-input{width:100%;padding:0.6rem 1rem 0.6rem 2.25rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.85rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--espresso);outline:none;}
+  .search-input:focus{border-color:var(--brown-mid);}
+  .filter-select{padding:0.6rem 1rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.82rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--text-body);outline:none;cursor:pointer;}
+  .sort-btn{padding:0.6rem 1rem;border-radius:8px;border:1.5px solid rgba(200,168,130,0.3);background:var(--warm-white);color:var(--brown-mid);font-size:0.82rem;font-family:"DM Sans",sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .sort-btn:hover{border-color:var(--brown-mid);color:var(--brown-dark);}
+  .history-content{flex:1;overflow-y:auto;padding:1.5rem 2rem;}
+  .history-count{font-size:0.78rem;color:var(--brown-light);margin-bottom:1rem;}
+  .table-wrap{background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);overflow:hidden;}
+  table{width:100%;border-collapse:collapse;}
+  thead{background:rgba(92,61,30,0.05);}
+  th{padding:0.75rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);font-weight:500;cursor:pointer;user-select:none;white-space:nowrap;}
+  th:hover{color:var(--brown-dark);}
+  td{padding:0.85rem 1rem;font-size:0.85rem;border-top:1px solid rgba(200,168,130,0.12);vertical-align:middle;}
+  tr:hover td{background:rgba(200,168,130,0.04);}
+  .order-num-cell{font-family:"Cormorant Garamond",serif;font-size:1rem;font-weight:500;color:var(--espresso);}
+  .order-items-cell{font-size:0.78rem;color:var(--brown-mid);line-height:1.5;}
+  .payment-badge{display:inline-flex;align-items:center;font-size:0.72rem;padding:3px 10px;border-radius:10px;font-weight:500;background:rgba(200,168,130,0.15);color:var(--brown-mid);}
+  .empty-state{text-align:center;padding:4rem 2rem;color:var(--brown-light);}
+  .empty-icon{font-size:2.5rem;margin-bottom:0.75rem;opacity:0.3;}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--espresso);color:var(--cream);padding:0.75rem 1.25rem;border-radius:10px;font-size:0.85rem;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s;pointer-events:none;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{background:var(--success);}
+  .toast.error{background:var(--danger);}
+
+  /* CONFIRM MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(44,26,14,0.5);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--warm-white);border-radius:16px;width:100%;max-width:420px;box-shadow:0 24px 80px rgba(0,0,0,0.3);}
+  .modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(200,168,130,0.2);display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-family:"Cormorant Garamond",serif;font-size:1.3rem;font-weight:500;color:var(--espresso);}
+  .modal-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--brown-light);}
+  .modal-body{padding:1.5rem;}
+  .modal-footer{padding:1rem 1.5rem;border-top:1px solid rgba(200,168,130,0.2);display:flex;gap:0.75rem;justify-content:flex-end;}
+  .btn{padding:0.55rem 1.1rem;border-radius:8px;font-size:0.8rem;font-weight:500;cursor:pointer;border:none;font-family:"DM Sans",sans-serif;transition:all 0.15s;}
+  .btn-primary{background:var(--brown-dark);color:var(--cream);}
+  .btn-primary:hover{background:var(--espresso);}
+  .btn-outline{background:transparent;color:var(--brown-dark);border:1.5px solid rgba(92,61,30,0.3);}
+  .confirm-order-num{font-family:"Cormorant Garamond",serif;font-size:1.4rem;color:var(--espresso);font-weight:500;}
+  .confirm-line{display:flex;justify-content:space-between;font-size:0.85rem;padding:0.4rem 0;border-bottom:1px solid rgba(200,168,130,0.1);}
+  .confirm-total{display:flex;justify-content:space-between;font-size:1rem;font-weight:500;padding:0.6rem 0 0;color:var(--espresso);}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">195 <span>Café</span></div>
+      <div class="sidebar-brand-sub">Management System</div>
+    </div>
+    <div class="sidebar-section">Orders</div>
+    <div class="sidebar-item active" onclick="showTab('new-order')"><span class="icon">📋</span> New Order</div>
+    <div class="sidebar-item" onclick="showTab('history')"><span class="icon">🧾</span> Order History</div>
+    <div class="sidebar-section">Menu</div>
+    <a class="sidebar-item" href="menu-admin.html"><span class="icon">☕</span> Products & Menu</a>
+    <div class="sidebar-section">Reports</div>
+    <a class="sidebar-item" href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="goBack()">⬅ Back to Admin</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- TAB NAV -->
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tab-new-order" onclick="showTab('new-order')">📋 New Order</button>
+      <button class="tab-btn" id="tab-history" onclick="showTab('history')">🧾 Order History</button>
+    </div>
+
+    <!-- NEW ORDER VIEW -->
+    <div class="view active" id="view-new-order">
+      <div class="order-layout">
+
+        <!-- Menu panel -->
+        <div class="menu-panel">
+          <div class="cat-tabs" id="cat-tabs"></div>
+          <div class="menu-grid" id="menu-grid"></div>
+        </div>
+
+        <!-- Order panel -->
+        <div class="order-panel">
+          <div class="order-header">
+            <div>
+              <div class="order-num-label">Order Number</div>
+              <div class="order-num" id="order-num-display">—</div>
+            </div>
+            <button class="new-order-btn" onclick="startNewOrder()">+ New Order</button>
+          </div>
+          <div class="cart-items" id="cart-items">
+            <div class="cart-empty">
+              <div class="cart-empty-icon">☕</div>
+              <div class="cart-empty-text">Tap an item to add it</div>
+            </div>
+          </div>
+          <div class="cart-footer">
+            <div class="cart-total-row">
+              <div class="cart-total-label">Total</div>
+              <div class="cart-total-val" id="cart-total">฿0</div>
+            </div>
+            <div class="payment-group">
+              <span class="payment-label">Payment Method</span>
+              <div class="payment-quick">
+                <button class="payment-quick-btn" onclick="setPayment('Cash')">💵 Cash</button>
+                <button class="payment-quick-btn" onclick="setPayment('QR Code')">📱 QR Code</button>
+              </div>
+              <input type="text" class="payment-input" id="payment-input" placeholder="Payment method…">
+            </div>
+            <button class="complete-btn" id="complete-btn" onclick="openConfirmModal()" disabled>Complete Order</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ORDER HISTORY VIEW -->
+    <div class="view" id="view-history">
+      <div class="history-layout">
+        <div class="history-toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="history-search" placeholder="Search by order number or item…" oninput="renderHistory()">
+          </div>
+          <select class="filter-select" id="history-payment-filter" onchange="renderHistory()">
+            <option value="all">All Payments</option>
+            <option value="Cash">Cash</option>
+            <option value="QR Code">QR Code</option>
+          </select>
+          <select class="filter-select" id="history-date-filter" onchange="renderHistory()">
+            <option value="all">All Dates</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+          <select class="filter-select" id="history-sort" onchange="renderHistory()">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="total-desc">Highest Total</option>
+            <option value="total-asc">Lowest Total</option>
+          </select>
+        </div>
+        <div class="history-content">
+          <div class="history-count" id="history-count"></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Date & Time</th>
+                  <th>Items</th>
+                  <th>Payment</th>
+                  <th style="text-align:right;">Total</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody"></tbody>
+            </table>
+            <div id="history-empty" class="empty-state" style="display:none;">
+              <div class="empty-icon">🧾</div>
+              <div>No orders found</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Confirm Order</div>
+      <button class="modal-close" onclick="closeConfirmModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:1rem;">
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--brown-light);margin-bottom:4px;">Order Number</div>
+        <div class="confirm-order-num" id="confirm-order-num"></div>
+      </div>
+      <div id="confirm-items"></div>
+      <div class="confirm-total">
+        <span>Total</span>
+        <span id="confirm-total-val"></span>
+      </div>
+      <div style="margin-top:0.75rem;font-size:0.82rem;color:var(--brown-mid);">Payment: <strong id="confirm-payment"></strong></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeConfirmModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="completeOrder()">✓ Confirm & Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STORAGE KEYS ────────────────────────────────────
+const SK = {
+  items:   'cafe195_items',
+  cats:    'cafe195_cats',
+  orders:  'cafe195_orders',
+  counter: 'cafe195_order_counter',
+};
+function load(k){ try{ return JSON.parse(localStorage.getItem(k))||null; }catch{ return null; } }
+function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
+
+// ─── DATA ────────────────────────────────────────────
+let menuItems = load(SK.items) || [];
+let cats      = load(SK.cats)  || [];
+let orders    = load(SK.orders) || [];
+let cart      = [];
+let activeCat = 'all';
+
+// ─── ORDER NUMBER ─────────────────────────────────────
+function genOrderNumber(){
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm   = String(now.getMonth()+1).padStart(2,'0');
+  const prefix = `${yyyy}${mm}`;
+  // Load counter: { prefix, last }
+  let counter = load(SK.counter) || { prefix:'', last:0 };
+  if(counter.prefix !== prefix){ counter = { prefix, last:0 }; }
+  counter.last += 1;
+  save(SK.counter, counter);
+  return prefix + String(counter.last).padStart(4,'0');
+}
+
+let currentOrderNum = null;
+
+function startNewOrder(){
+  if(cart.length > 0){
+    if(!confirm('Start a new order? Current items will be cleared.')) return;
+  }
+  cart = [];
+  currentOrderNum = genOrderNumber();
+  document.getElementById('payment-input').value = '';
+  document.querySelectorAll('.payment-quick-btn').forEach(b=>b.classList.remove('active'));
+  renderOrderNum();
+  renderCart();
+}
+
+function renderOrderNum(){
+  document.getElementById('order-num-display').textContent = currentOrderNum || '—';
+}
+
+// ─── TABS ────────────────────────────────────────────
+function showTab(tab){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach((el,i)=>{
+    el.classList.toggle('active',(tab==='new-order'&&i===0)||(tab==='history'&&i===1));
+  });
+  document.getElementById('view-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='history') renderHistory();
+}
+
+// ─── MENU RENDER ─────────────────────────────────────
+function renderCatTabs(){
+  const wrap = document.getElementById('cat-tabs');
+  let html = `<div class="cat-tab ${activeCat==='all'?'active':''}" onclick="setActiveCat('all')">All</div>`;
+  cats.forEach(c=>{
+    html += `<div class="cat-tab ${activeCat===c.id?'active':''}" onclick="setActiveCat('${c.id}')">${c.icon} ${c.name}</div>`;
+  });
+  wrap.innerHTML = html;
+}
+function setActiveCat(id){ activeCat=id; renderCatTabs(); renderMenuGrid(); }
+
+function renderMenuGrid(){
+  const grid = document.getElementById('menu-grid');
+  const filtered = activeCat==='all' ? menuItems : menuItems.filter(i=>i.catId===activeCat);
+  if(!filtered.length){ grid.innerHTML='<div style="color:var(--brown-light);font-size:0.85rem;padding:1rem;">No items in this category.</div>'; return; }
+  grid.innerHTML = filtered.map(item=>{
+    const cat = cats.find(c=>c.id===item.catId);
+    const prices = [];
+    if(item.hot  != null) prices.push({label:'Hot',   val:item.hot});
+    if(item.iced != null) prices.push({label:'Iced',  val:item.iced});
+    if(item.blend!= null) prices.push({label:'Blend', val:item.blend});
+    const priceHTML = prices.map(p=>
+      `<span class="price-chip" onclick="${item.available?`addToCart('${item.id}','${p.label}',${p.val},event)`:'void(0)'}">${p.label} ${p.val}฿</span>`
+    ).join('');
+    return `<div class="menu-item-card ${!item.available?'unavailable':''}" onclick="${item.available&&prices.length===1?`addToCart('${item.id}','${prices[0].label}',${prices[0].val},event)`:'void(0)'}">
+      <div class="menu-card-name">${item.name}</div>
+      <div class="menu-card-cat">${cat?cat.icon+' '+cat.name:''}</div>
+      <div class="menu-card-prices">${priceHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── CART ────────────────────────────────────────────
+function addToCart(itemId, type, price, e){
+  if(e) e.stopPropagation();
+  if(!currentOrderNum) startNewOrder();
+  const key = `${itemId}__${type}`;
+  const existing = cart.find(c=>c.key===key);
+  if(existing){ existing.qty++; }
+  else{
+    const item = menuItems.find(i=>i.id===itemId);
+    cart.push({ key, itemId, name:item.name, type, price, qty:1 });
+  }
+  renderCart();
+}
+
+function changeQty(key, delta){
+  const entry = cart.find(c=>c.key===key);
+  if(!entry) return;
+  entry.qty += delta;
+  if(entry.qty <= 0) cart = cart.filter(c=>c.key!==key);
+  renderCart();
+}
+
+function removeFromCart(key){
+  cart = cart.filter(c=>c.key!==key);
+  renderCart();
+}
+
+function getTotal(){ return cart.reduce((s,c)=>s+c.price*c.qty,0); }
+
+function renderCart(){
+  const container = document.getElementById('cart-items');
+  if(!cart.length){
+    container.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">☕</div><div class="cart-empty-text">Tap an item to add it</div></div>`;
+    document.getElementById('cart-total').textContent = '฿0';
+    document.getElementById('complete-btn').disabled = true;
+    return;
+  }
+  container.innerHTML = cart.map(c=>`
+    <div class="cart-item">
+      <div style="flex:1;">
+        <div class="cart-item-name">${c.name}</div>
+        <div class="cart-item-price">${c.type} · ${c.price}฿ each</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty('${c.key}',-1)">−</button>
+        <span class="qty-num">${c.qty}</span>
+        <button class="qty-btn" onclick="changeQty('${c.key}',1)">+</button>
+      </div>
+      <div class="cart-item-total">${c.price*c.qty}฿</div>
+      <button class="remove-btn" onclick="removeFromCart('${c.key}')" title="Remove">✕</button>
+    </div>
+  `).join('');
+  document.getElementById('cart-total').textContent = '฿'+getTotal();
+  document.getElementById('complete-btn').disabled = false;
+}
+
+// ─── PAYMENT ─────────────────────────────────────────
+function setPayment(method){
+  document.getElementById('payment-input').value = method;
+  document.querySelectorAll('.payment-quick-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent.includes(method));
+  });
+}
+
+// ─── CONFIRM + COMPLETE ───────────────────────────────
+function openConfirmModal(){
+  if(!cart.length){ showToast('Add items first','error'); return; }
+  const payment = document.getElementById('payment-input').value.trim();
+  if(!payment){ showToast('Please enter payment method','error'); return; }
+  document.getElementById('confirm-order-num').textContent = currentOrderNum;
+  document.getElementById('confirm-items').innerHTML = cart.map(c=>`
+    <div class="confirm-line">
+      <span>${c.name} <span style="color:var(--brown-light)">(${c.type})</span> × ${c.qty}</span>
+      <span>${c.price*c.qty}฿</span>
+    </div>
+  `).join('');
+  document.getElementById('confirm-total-val').textContent = '฿'+getTotal();
+  document.getElementById('confirm-payment').textContent = payment;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function closeConfirmModal(){ document.getElementById('confirm-modal').classList.remove('open'); }
+
+function completeOrder(){
+  const payment = document.getElementById('payment-input').value.trim();
+  const order = {
+    id:        currentOrderNum,
+    timestamp: new Date().toISOString(),
+    items:     cart.map(c=>({name:c.name, type:c.type, price:c.price, qty:c.qty})),
+    total:     getTotal(),
+    payment,
+  };
+  orders.push(order);
+  save(SK.orders, orders);
+  closeConfirmModal();
+  showToast(`Order ${currentOrderNum} saved ✓`, 'success');
+  cart = [];
+  currentOrderNum = genOrderNumber();
+  renderOrderNum();
+  renderCart();
+  document.getElementById('payment-input').value='';
+  document.querySelectorAll('.payment-quick-btn').forEach(b=>b.classList.remove('active'));
+}
+
+// ─── ORDER HISTORY ────────────────────────────────────
+function renderHistory(){
+  const q       = document.getElementById('history-search').value.toLowerCase();
+  const payment = document.getElementById('history-payment-filter').value;
+  const dateF   = document.getElementById('history-date-filter').value;
+  const sortV   = document.getElementById('history-sort').value;
+
+  const now   = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekStart = new Date(today); weekStart.setDate(today.getDate()-today.getDay());
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  let list = orders.filter(o=>{
+    const matchQ = !q || o.id.toLowerCase().includes(q) || o.items.some(i=>i.name.toLowerCase().includes(q));
+    const matchP = payment==='all' || o.payment===payment;
+    const d = new Date(o.timestamp);
+    let matchD = true;
+    if(dateF==='today')  matchD = d >= today;
+    if(dateF==='week')   matchD = d >= weekStart;
+    if(dateF==='month')  matchD = d >= monthStart;
+    return matchQ && matchP && matchD;
+  });
+
+  if(sortV==='date-desc')  list.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+  if(sortV==='date-asc')   list.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
+  if(sortV==='total-desc') list.sort((a,b)=>b.total-a.total);
+  if(sortV==='total-asc')  list.sort((a,b)=>a.total-b.total);
+
+  const tbody = document.getElementById('history-tbody');
+  const empty = document.getElementById('history-empty');
+  document.getElementById('history-count').textContent = `${list.length} order${list.length!==1?'s':''} found`;
+
+  if(!list.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  tbody.innerHTML = list.map(o=>{
+    const d = new Date(o.timestamp);
+    const dateStr = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    const timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const itemSummary = o.items.map(i=>`${i.name} (${i.type}) ×${i.qty}`).join(', ');
+    return `<tr>
+      <td class="order-num-cell">${o.id}</td>
+      <td style="white-space:nowrap;">${dateStr}<br><span style="font-size:0.75rem;color:var(--brown-light);">${timeStr}</span></td>
+      <td class="order-items-cell">${itemSummary}</td>
+      <td><span class="payment-badge">${o.payment}</span></td>
+      <td style="text-align:right;font-weight:500;color:var(--espresso);">฿${o.total}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── TOAST ───────────────────────────────────────────
+let toastTimer;
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.className='toast',2800);
+}
+
+function goBack(){ window.location.href='menu-admin.html'; }
+
+// ─── INIT ────────────────────────────────────────────
+menuItems = load(SK.items) || [];
+cats      = load(SK.cats)  || [];
+orders    = load(SK.orders) || [];
+renderCatTabs();
+renderMenuGrid();
+startNewOrder();
+</script>
+</body>
+</html>
