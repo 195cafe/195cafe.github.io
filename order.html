@@ -89,6 +89,16 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 .empty-state{text-align:center;padding:4rem 2rem;color:var(--brown-light);}
 .empty-icon{font-size:2.5rem;margin-bottom:0.75rem;opacity:0.3;}
 
+/* Pagination */
+.pagination-bar{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1rem;border-top:1px solid rgba(200,168,130,0.15);background:var(--warm-white);flex-wrap:wrap;gap:0.5rem;}
+.pagination-info{font-size:0.78rem;color:var(--brown-light);}
+.pagination-controls{display:flex;align-items:center;gap:0.3rem;}
+.page-btn{min-width:32px;height:32px;padding:0 0.5rem;border-radius:7px;border:1.5px solid rgba(200,168,130,0.3);background:transparent;color:var(--brown-mid);font-size:0.82rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center;}
+.page-btn:hover{border-color:var(--brown-mid);color:var(--brown-dark);}
+.page-btn.active{background:var(--brown-dark);color:var(--cream);border-color:var(--brown-dark);}
+.page-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.page-dots{font-size:0.82rem;color:var(--brown-light);padding:0 4px;}
+
 /* ══════════════════════════════════════
    NEW / EDIT ORDER VIEW
 ══════════════════════════════════════ */
@@ -236,24 +246,30 @@ tr:hover td{background:rgba(200,168,130,0.04);}
         <div class="toolbar">
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" id="list-search" placeholder="Search by order # or item…" oninput="renderList()">
+            <input type="text" class="search-input" id="list-search" placeholder="Search by order # or item…" oninput="currentPage=1;renderList()">
           </div>
-          <select class="filter-select" id="list-payment" onchange="renderList()">
+          <select class="filter-select" id="list-payment" onchange="currentPage=1;renderList()">
             <option value="all">All Payments</option>
             <option value="Cash">Cash</option>
             <option value="QR Code">QR Code</option>
           </select>
-          <select class="filter-select" id="list-date" onchange="renderList()">
+          <select class="filter-select" id="list-date" onchange="currentPage=1;renderList()">
             <option value="today">Today</option>
             <option value="week">This Week</option>
             <option value="month">This Month</option>
             <option value="all">All Dates</option>
           </select>
-          <select class="filter-select" id="list-sort" onchange="renderList()">
+          <select class="filter-select" id="list-sort" onchange="currentPage=1;renderList()">
             <option value="date-desc">Newest First</option>
             <option value="date-asc">Oldest First</option>
             <option value="total-desc">Highest Total</option>
             <option value="total-asc">Lowest Total</option>
+          </select>
+          <select class="filter-select" id="list-pagesize" onchange="currentPage=1;renderList()" title="Rows per page">
+            <option value="10">10 / page</option>
+            <option value="20">20 / page</option>
+            <option value="50">50 / page</option>
+            <option value="100">100 / page</option>
           </select>
           <button class="clear-btn" onclick="clearFilters()">✕ Clear</button>
         </div>
@@ -274,6 +290,10 @@ tr:hover td{background:rgba(200,168,130,0.04);}
           <div id="list-empty" class="empty-state" style="display:none;">
             <div class="empty-icon">🧾</div>
             <div>No orders found</div>
+          </div>
+          <div class="pagination-bar" id="pagination-bar" style="display:none;">
+            <div class="pagination-info" id="pagination-info"></div>
+            <div class="pagination-controls" id="pagination-controls"></div>
           </div>
         </div>
       </div>
@@ -460,23 +480,28 @@ window.addEventListener('hashchange', handleRoute);
 window.addEventListener('load', handleRoute);
 
 // ══ LIST VIEW ══
+let currentPage = 1;
+
 function clearFilters() {
   document.getElementById('list-search').value = '';
   document.getElementById('list-payment').value = 'all';
   document.getElementById('list-date').value = 'today';
   document.getElementById('list-sort').value = 'date-desc';
+  document.getElementById('list-pagesize').value = '10';
+  currentPage = 1;
   renderList();
 }
 
 function renderList() {
-  const q     = document.getElementById('list-search').value.toLowerCase();
-  const payF  = document.getElementById('list-payment').value;
-  const dateF = document.getElementById('list-date').value;
-  const sortV = document.getElementById('list-sort').value;
+  const q        = document.getElementById('list-search').value.toLowerCase();
+  const payF     = document.getElementById('list-payment').value;
+  const dateF    = document.getElementById('list-date').value;
+  const sortV    = document.getElementById('list-sort').value;
+  const pageSize = parseInt(document.getElementById('list-pagesize').value) || 10;
 
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const weekStart = new Date(today); weekStart.setDate(today.getDate()-today.getDay());
+  const today      = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekStart  = new Date(today); weekStart.setDate(today.getDate()-today.getDay());
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
   let list = orders.filter(o => {
@@ -495,21 +520,34 @@ function renderList() {
   if(sortV==='total-desc') list.sort((a,b)=>b.total-a.total);
   if(sortV==='total-asc')  list.sort((a,b)=>a.total-b.total);
 
-  // Summary cards
+  // Summary cards — always reflect full filtered list
   const sumTotal = list.reduce((s,o)=>s+o.total, 0);
   document.getElementById('sum-count').textContent = list.length;
   document.getElementById('sum-count-sub').textContent = list.length===1 ? '1 order' : `${list.length} orders`;
   document.getElementById('sum-total').textContent = '฿'+sumTotal.toLocaleString();
   document.getElementById('sum-total-sub').textContent = list.length ? `avg ฿${Math.round(sumTotal/list.length)} per order` : '';
 
-  document.getElementById('list-count').textContent = `${list.length} order${list.length!==1?'s':''} found`;
+  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+  if(currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage-1) * pageSize;
+  const end   = Math.min(start + pageSize, list.length);
+  const paged = list.slice(start, end);
+
+  document.getElementById('list-count').textContent =
+    list.length ? `Showing ${start+1}–${end} of ${list.length} order${list.length!==1?'s':''}` : '';
 
   const tbody = document.getElementById('list-tbody');
   const empty = document.getElementById('list-empty');
-  if(!list.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
+  const pagBar = document.getElementById('pagination-bar');
 
-  tbody.innerHTML = list.map(o=>{
+  if(!list.length){
+    tbody.innerHTML=''; empty.style.display='block'; pagBar.style.display='none'; return;
+  }
+  empty.style.display='none';
+  pagBar.style.display = totalPages > 1 ? 'flex' : 'none';
+
+  tbody.innerHTML = paged.map(o=>{
     const d = new Date(o.timestamp);
     const summary = o.items.map(i=>`${i.name} ×${i.qty}`).join(', ');
     const short = summary.length>55 ? summary.slice(0,52)+'…' : summary;
@@ -528,6 +566,56 @@ function renderList() {
       </td>
     </tr>`;
   }).join('');
+
+  // Pagination info
+  document.getElementById('pagination-info').textContent =
+    `Page ${currentPage} of ${totalPages}`;
+
+  // Pagination controls
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  const ctrl = document.getElementById('pagination-controls');
+  const pages = [];
+
+  // Always show: prev, first, ...dots..., current±1, ...dots..., last, next
+  const delta = 1; // pages around current
+  const range = [];
+  for(let i = Math.max(2, currentPage-delta); i <= Math.min(totalPages-1, currentPage+delta); i++){
+    range.push(i);
+  }
+
+  let html = '';
+  // Prev
+  html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>`;
+  // Page 1
+  html += `<button class="page-btn ${currentPage===1?'active':''}" onclick="goPage(1)">1</button>`;
+  // Left dots
+  if(range[0] > 2) html += `<span class="page-dots">…</span>`;
+  // Middle pages
+  range.forEach(p => {
+    html += `<button class="page-btn ${currentPage===p?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  });
+  // Right dots
+  if(totalPages > 1 && range[range.length-1] < totalPages-1) html += `<span class="page-dots">…</span>`;
+  // Last page (if more than 1)
+  if(totalPages > 1){
+    html += `<button class="page-btn ${currentPage===totalPages?'active':''}" onclick="goPage(${totalPages})">${totalPages}</button>`;
+  }
+  // Next
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>→</button>`;
+
+  ctrl.innerHTML = html;
+}
+
+function goPage(p) {
+  const pageSize = parseInt(document.getElementById('list-pagesize').value) || 10;
+  const totalPages = Math.ceil(orders.length / pageSize);
+  currentPage = Math.max(1, Math.min(p, totalPages));
+  renderList();
+  // Scroll list content to top
+  document.querySelector('.list-content').scrollTop = 0;
 }
 
 // ══ FORM VIEW ══
