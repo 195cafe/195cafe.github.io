@@ -72,6 +72,7 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
 table{width:100%;border-collapse:collapse;}
 thead{background:rgba(92,61,30,0.05);}
 th{padding:0.75rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);font-weight:500;white-space:nowrap;}
+th[onclick]:hover{color:var(--brown-dark);background:rgba(200,168,130,0.08);}
 td{padding:0.75rem 1rem;font-size:0.85rem;border-top:1px solid rgba(200,168,130,0.12);vertical-align:middle;}
 tr:hover td{background:rgba(200,168,130,0.04);}
 .cat-badge{display:inline-flex;font-size:0.68rem;padding:2px 8px;border-radius:8px;font-weight:500;white-space:nowrap;}
@@ -141,13 +142,13 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 @media (max-width: 768px) {
   #app { flex-direction: column; height: auto; min-height: 100vh; }
   .sidebar {
-    position: fixed; top: 0; left: 0; bottom: 0;
+    position: fixed !important; top: 0; left: 0; bottom: 0;
     width: 280px; z-index: 200; height: 100vh;
     transform: translateX(-100%);
     transition: transform 0.28s ease;
     box-shadow: 4px 0 24px rgba(0,0,0,0.25);
   }
-  .sidebar.open { transform: translateX(0); }
+  .sidebar.open { transform: translateX(0) !important; }
   .sidebar-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.45); z-index: 199;
@@ -218,6 +219,21 @@ tr:hover td{background:rgba(200,168,130,0.04);}
     padding-bottom: 80px !important;
   }
 }
+
+/* ── DETAIL VIEW ── */
+.view { display:none; flex-direction:column; }
+.view.active { display:flex !important; }
+.detail-panel { background:var(--warm-white);border-radius:14px;border:1px solid rgba(200,168,130,0.2);overflow:hidden;margin-bottom:1rem; }
+.detail-panel-head { padding:0.9rem 1.25rem;border-bottom:1px solid rgba(200,168,130,0.15);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--brown-mid); }
+.detail-panel-body { padding:1.25rem; }
+.detail-row { display:flex;justify-content:space-between;align-items:flex-start;padding:0.55rem 0;border-bottom:1px solid rgba(200,168,130,0.1);font-size:0.88rem; }
+.detail-row:last-child { border-bottom:none; }
+.detail-key { color:var(--brown-mid); }
+.detail-val { font-weight:500;color:var(--espresso);text-align:right;max-width:60%; }
+.detail-total { display:flex;justify-content:space-between;align-items:baseline;padding:0.85rem 0 0;border-top:1px solid rgba(200,168,130,0.2);margin-top:0.25rem; }
+.detail-total-label { font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid); }
+.detail-total-val { font-family:"DM Sans",sans-serif;font-size:1.8rem;font-weight:700;color:var(--espresso);letter-spacing:-0.02em; }
+.receipt-full { width:100%;max-height:320px;object-fit:contain;border-radius:10px;border:1px solid rgba(200,168,130,0.2);margin-top:0.75rem;cursor:pointer; }
 </style>
 </head>
 <body>
@@ -237,7 +253,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
     <div class="sidebar-section">Orders</div>
     <a class="sidebar-link" href="order.html#list"><span class="icon">🧾</span> Orders</a>
     <div class="sidebar-section">Menu</div>
-    <a class="sidebar-link" href="menu-admin.html"><span class="icon">☕</span> Products & Menu</a>
+    <a class="sidebar-link" href="menu-admin.html"><span class="icon">☕</span> Menu</a>
     <a class="sidebar-link" href="categories.html"><span class="icon">📂</span> Categories</a>
     <div class="sidebar-section">Finance</div>
     <a class="sidebar-link active" href="expenses.html"><span class="icon">💰</span> Expenses</a>
@@ -259,7 +275,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
       </div>
     </div>
 
-    <div class="content">
+    <div class="view active" id="view-list"><div class="content">
       <!-- Summary cards -->
       <div class="summary-strip">
         <div class="summary-card">
@@ -362,12 +378,12 @@ tr:hover td{background:rgba(200,168,130,0.04);}
         <table>
           <thead><tr>
             <th>Receipt</th>
-            <th>Date</th>
+            <th onclick="setSort('date')" style="cursor:pointer;user-select:none;">Date <span id="esort-date">↓</span></th>
             <th>Category</th>
             <th>Name / Detail</th>
             <th>Payment</th>
             <th>Paid By</th>
-            <th style="text-align:right;">Amount</th>
+            <th onclick="setSort('amount')" style="cursor:pointer;user-select:none;text-align:right;">Amount <span id="esort-amount"></span></th>
             <th></th>
           </tr></thead>
           <tbody id="list-tbody"></tbody>
@@ -382,6 +398,24 @@ tr:hover td{background:rgba(200,168,130,0.04);}
         </div>
       </div>
     </div>
+
+    <!-- ══ DETAIL VIEW ══ -->
+    <div class="view" id="view-detail" style="display:none;flex-direction:column;overflow-y:auto;">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <button class="btn btn-outline btn-sm" onclick="navigate('list')">← Back</button>
+          <div class="topbar-title" id="detail-title">Expense Detail</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-outline btn-sm" onclick="editCurrentExpense()">✏ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCurrentExpense()">Delete</button>
+        </div>
+      </div>
+      <div style="padding:1.25rem 2rem;flex:1;overflow-y:auto;" id="detail-content">
+        <!-- populated by renderExpenseDetail() -->
+      </div>
+    </div>
+    </div><!-- end view-list -->
   </div>
 </div>
 
@@ -480,16 +514,112 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 // ── MOBILE SIDEBAR ──
-function openSidebar(){
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebar-overlay').classList.add('open');
-  document.body.style.overflow='hidden';
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');document.body.style.overflow='';}
+
+// ── HASH ROUTING ──
+let currentExpenseId = null;
+
+function navigate(path) { window.location.hash = path; }
+
+async function handleRoute() {
+  const hash = window.location.hash.slice(1) || 'list';
+  const [view, param] = hash.split('/');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  if(view==='detail' && param) {
+    currentExpenseId = param;
+    document.getElementById('view-detail').classList.add('active');
+    updateMobileTopbar('detail');
+    await renderExpenseDetail(param);
+  } else {
+    document.getElementById('view-list').classList.add('active');
+    updateMobileTopbar('list');
+    await loadExpenses();
+    renderList();
+  }
 }
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebar-overlay').classList.remove('open');
-  document.body.style.overflow='';
+
+function updateMobileTopbar(view) {
+  const topbar = document.querySelector('.mobile-topbar');
+  if(!topbar) return;
+  // Remove dynamic buttons
+  ['mob-back','mob-edit'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
+  const addBtn = topbar.querySelector('button[onclick*="openModal"]');
+  if(view==='detail') {
+    if(addBtn) addBtn.style.display='none';
+    const back = document.createElement('button');
+    back.id='mob-back'; back.textContent='← Back';
+    back.style.cssText='background:transparent;border:1.5px solid rgba(92,61,30,0.3);color:var(--brown-dark);padding:0.32rem 0.7rem;border-radius:8px;font-size:0.78rem;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif;';
+    back.onclick=()=>navigate('list');
+    const edit = document.createElement('button');
+    edit.id='mob-edit'; edit.textContent='✏ Edit';
+    edit.style.cssText='background:var(--brown-dark);color:var(--cream);border:none;padding:0.32rem 0.7rem;border-radius:8px;font-size:0.78rem;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif;';
+    edit.onclick=()=>editCurrentExpense();
+    topbar.appendChild(back);
+    topbar.appendChild(edit);
+  } else {
+    if(addBtn) addBtn.style.display='';
+  }
 }
+
+async function renderExpenseDetail(id) {
+  const { data: exp, error } = await db.from('expenses').select('*').eq('id',id).single();
+  if(error||!exp) { navigate('list'); return; }
+  currentExpenseId = id;
+  document.getElementById('detail-title').textContent = exp.expense_name || exp.note || 'Expense';
+  const catLabel = exp.sub_category ? `${exp.category} › ${exp.sub_category}` : (exp.category||'—');
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-panel">
+      <div class="detail-panel-head">Expense Details</div>
+      <div class="detail-panel-body">
+        <div class="detail-row"><span class="detail-key">Date</span><span class="detail-val">${fmtDate(exp.date)}</span></div>
+        <div class="detail-row"><span class="detail-key">Category</span><span class="detail-val">${catLabel}</span></div>
+        <div class="detail-row"><span class="detail-key">Name / Detail</span><span class="detail-val">${exp.expense_name||exp.note||'—'}</span></div>
+        <div class="detail-row"><span class="detail-key">Payment Method</span><span class="detail-val">${exp.payment_method||'—'}</span></div>
+        <div class="detail-row"><span class="detail-key">Paid By</span><span class="detail-val">${exp.paid_by||'—'}</span></div>
+        <div class="detail-total">
+          <span class="detail-total-label">Amount</span>
+          <span class="detail-total-val">฿${parseFloat(exp.amount).toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+    ${exp.receipt_photo ? `
+    <div class="detail-panel">
+      <div class="detail-panel-head">Receipt Photo</div>
+      <div class="detail-panel-body">
+        <img src="${exp.receipt_photo}" class="receipt-full" onclick="openLightbox('${exp.receipt_photo}')" alt="receipt">
+      </div>
+    </div>` : ''}`;
+}
+
+function editCurrentExpense() {
+  if(!currentExpenseId) return;
+  const exp = expenses.find(e=>e.id===currentExpenseId);
+  if(exp) { openModal(currentExpenseId); }
+  else {
+    db.from('expenses').select('*').eq('id',currentExpenseId).single().then(({data})=>{
+      if(data) { expenses.push(data); openModal(currentExpenseId); }
+    });
+  }
+}
+
+async function deleteCurrentExpense() {
+  if(!currentExpenseId) return;
+  if(!confirm('Delete this expense?')) return;
+  const {error} = await db.from('expenses').delete().eq('id',currentExpenseId);
+  if(error){ showToast('Error: '+error.message,'error'); return; }
+  showToast('Deleted','error');
+  navigate('list');
+}
+
+function fmtDate(dateStr) {
+  if(!dateStr) return '—';
+  const d = new Date(dateStr+'T00:00:00');
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+window.addEventListener('hashchange', handleRoute);
+window.addEventListener('load', handleRoute);
 </script>
 <script>
 const SB_URL = 'https://nczopypmbybjvkxqpxgy.supabase.co';
@@ -506,6 +636,20 @@ const CAFE_PAYMENTS = ['Cafe Cash','Cafe Bank Account'];
 
 let expenses    = [];
 let currentPage = 1;
+let sortCol = 'date', sortDir = 'desc';
+
+function setSort(col) {
+  if(sortCol===col) sortDir = sortDir==='desc' ? 'asc' : 'desc';
+  else { sortCol=col; sortDir='desc'; }
+  currentPage=1; renderList();
+}
+function updateSortIndicators() {
+  ['date','amount'].forEach(col=>{
+    const el=document.getElementById('esort-'+col);
+    if(!el) return;
+    el.textContent = sortCol===col ? (sortDir==='desc'?'↓':'↑') : '';
+  });
+}
 let receiptB64  = '';
 
 // ══ LOAD ══
@@ -682,9 +826,8 @@ function clearFilters() {
   document.getElementById('list-payment').value  = 'all';
   document.getElementById('list-paidby').value   = 'all';
   document.getElementById('list-date').value     = 'month';
-  document.getElementById('list-sort').value     = 'date-desc';
-  document.getElementById('list-pagesize').value = '10';
-  currentPage = 1;
+  sortCol='date'; sortDir='desc';
+  currentPage=1;
   renderList();
 }
 
@@ -694,8 +837,7 @@ function renderList() {
   const payment  = document.getElementById('list-payment').value;
   const paidby   = document.getElementById('list-paidby').value;
   const dateF    = document.getElementById('list-date').value;
-  const sort     = document.getElementById('list-sort').value;
-  const pageSize = parseInt(document.getElementById('list-pagesize').value)||10;
+  const pageSize = 10;
   const fromDate = getFromDate(dateF);
 
   let list = expenses.filter(e => {
@@ -707,10 +849,13 @@ function renderList() {
     return matchQ && matchC && matchP && matchPB && matchD;
   });
 
-  if(sort==='date-desc')   list.sort((a,b)=>b.date.localeCompare(a.date));
-  if(sort==='date-asc')    list.sort((a,b)=>a.date.localeCompare(b.date));
-  if(sort==='amount-desc') list.sort((a,b)=>b.amount-a.amount);
-  if(sort==='amount-asc')  list.sort((a,b)=>a.amount-b.amount);
+  list.sort((a,b) => {
+    let va,vb;
+    if(sortCol==='amount') { va=parseFloat(a.amount); vb=parseFloat(b.amount); }
+    else { va=a.date||''; vb=b.date||''; }
+    return sortDir==='desc' ? (vb>va?1:-1) : (va>vb?1:-1);
+  });
+  updateSortIndicators();
 
   const total       = list.reduce((s,e)=>s+parseFloat(e.amount),0);
   const count       = list.length;
@@ -780,8 +925,7 @@ function renderPagination(totalPages) {
 }
 
 function goPage(p){
-  const ps=parseInt(document.getElementById('list-pagesize').value)||10;
-  currentPage=Math.max(1,Math.min(p,Math.ceil(expenses.length/ps)));
+  currentPage=Math.max(1,Math.min(p,Math.ceil(expenses.length/10)));
   renderList();
   window.scrollTo(0,0);
 }
@@ -808,7 +952,7 @@ function showToast(msg,type=''){
 }
 
 // ══ INIT ══
-loadExpenses().then(renderList);
+// Init handled by hashchange/load above
 </script>
 </body>
 </html>

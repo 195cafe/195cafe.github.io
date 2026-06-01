@@ -81,6 +81,7 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
 table{width:100%;border-collapse:collapse;}
 thead{background:rgba(92,61,30,0.05);}
 th{padding:0.75rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);font-weight:500;white-space:nowrap;}
+th[onclick]:hover{color:var(--brown-dark);background:rgba(200,168,130,0.08);}
 td{padding:0.8rem 1rem;font-size:0.85rem;border-top:1px solid rgba(200,168,130,0.12);vertical-align:middle;}
 tr:hover td{background:rgba(200,168,130,0.04);}
 .order-id-cell{font-family:"DM Sans",sans-serif;font-size:0.95rem;font-weight:700;color:var(--espresso);letter-spacing:-0.01em;}
@@ -199,13 +200,13 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 
   /* Sidebar slides in */
   .sidebar {
-    position: fixed; top: 0; left: 0; bottom: 0; height: 100vh;
+    position: fixed !important; top: 0; left: 0; bottom: 0; height: 100vh;
     width: 280px; z-index: 200;
     transform: translateX(-100%);
     transition: transform 0.28s ease;
     box-shadow: 4px 0 24px rgba(0,0,0,0.25);
   }
-  .sidebar.open { transform: translateX(0); }
+  .sidebar.open { transform: translateX(0) !important; }
   .sidebar-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.45); z-index: 199;
@@ -365,7 +366,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
     <div class="sidebar-section">Orders</div>
     <a class="sidebar-link" id="sb-orders" href="#list"><span class="icon">🧾</span> Orders</a>
     <div class="sidebar-section">Menu</div>
-    <a class="sidebar-link" href="menu-admin.html"><span class="icon">☕</span> Products & Menu</a>
+    <a class="sidebar-link" href="menu-admin.html"><span class="icon">☕</span> Menu</a>
     <a class="sidebar-link" href="categories.html"><span class="icon">📂</span> Categories</a>
     <div class="sidebar-section">Finance</div>
     <a class="sidebar-link" href="expenses.html"><span class="icon">💰</span> Expenses</a>
@@ -422,18 +423,6 @@ tr:hover td{background:rgba(200,168,130,0.04);}
             <option value="month">This Month</option>
             <option value="all">All Dates</option>
           </select>
-          <select class="filter-select" id="list-sort" onchange="currentPage=1;renderList()">
-            <option value="date-desc">Newest First</option>
-            <option value="date-asc">Oldest First</option>
-            <option value="total-desc">Highest Total</option>
-            <option value="total-asc">Lowest Total</option>
-          </select>
-          <select class="filter-select" id="list-pagesize" onchange="currentPage=1;renderList()" title="Rows per page">
-            <option value="10">10 / page</option>
-            <option value="20">20 / page</option>
-            <option value="50">50 / page</option>
-            <option value="100">100 / page</option>
-          </select>
           <button class="clear-btn" onclick="clearFilters()">✕ Clear</button>
         </div>
 
@@ -441,11 +430,11 @@ tr:hover td{background:rgba(200,168,130,0.04);}
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th>Order #</th>
-              <th>Date & Time</th>
+              <th onclick="setSort('id')" style="cursor:pointer;user-select:none;">Order # <span id="sort-id"></span></th>
+              <th onclick="setSort('date')" style="cursor:pointer;user-select:none;">Date & Time <span id="sort-date">↓</span></th>
               <th>Items</th>
               <th>Payment</th>
-              <th style="text-align:right;">Total</th>
+              <th onclick="setSort('total')" style="cursor:pointer;user-select:none;text-align:right;">Total <span id="sort-total"></span></th>
               <th></th>
             </tr></thead>
             <tbody id="list-tbody"></tbody>
@@ -607,6 +596,7 @@ async function handleRoute() {
   } else if(view === 'new') {
     document.getElementById('view-form').classList.add('active');
     document.getElementById('form-title').textContent = 'New Order';
+    updateMobileUI('new');
     editingOrderId = null;
     cart = [];
     document.getElementById('form-payment').value = '';
@@ -620,6 +610,7 @@ async function handleRoute() {
     if(!order){ navigate('list'); return; }
     document.getElementById('view-form').classList.add('active');
     document.getElementById('form-title').textContent = 'Edit Order';
+    updateMobileUI('edit', param);
     editingOrderId = param;
     cart = order.items.map(i=>{
       const cat    = cats.find(c=>c.id===i.itemId ? menuItems.find(m=>m.id===i.itemId)?.catId : null);
@@ -642,6 +633,7 @@ async function handleRoute() {
 
   } else if(view === 'detail' && param) {
     document.getElementById('view-detail').classList.add('active');
+    updateMobileUI('detail', param);
     currentDetailId = param;
     // Fetch directly from Supabase to guarantee fresh data
     const { data: orderRows, error: oErr } = await db.from('orders').select('*').eq('id', param).single();
@@ -658,23 +650,37 @@ window.addEventListener('load', handleRoute);
 
 // ══ LIST VIEW ══
 let currentPage = 1;
+let sortCol = 'date', sortDir = 'desc';
+
+function setSort(col) {
+  if(sortCol === col) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  else { sortCol = col; sortDir = 'desc'; }
+  currentPage = 1;
+  renderList();
+}
+
+function updateSortIndicators() {
+  ['id','date','total'].forEach(col => {
+    const el = document.getElementById('sort-'+col);
+    if(!el) return;
+    el.textContent = sortCol===col ? (sortDir==='desc' ? '↓' : '↑') : '';
+  });
+}
 
 function clearFilters() {
   document.getElementById('list-search').value = '';
   document.getElementById('list-payment').value = 'all';
   document.getElementById('list-date').value = 'today';
-  document.getElementById('list-sort').value = 'date-desc';
-  document.getElementById('list-pagesize').value = '10';
+  sortCol = 'date'; sortDir = 'desc';
   currentPage = 1;
   renderList();
 }
 
 function renderList() {
-  const q        = document.getElementById('list-search').value.toLowerCase();
-  const payF     = document.getElementById('list-payment').value;
-  const dateF    = document.getElementById('list-date').value;
-  const sortV    = document.getElementById('list-sort').value;
-  const pageSize = parseInt(document.getElementById('list-pagesize').value) || 10;
+  const q      = document.getElementById('list-search').value.toLowerCase();
+  const payF   = document.getElementById('list-payment').value;
+  const dateF  = document.getElementById('list-date').value;
+  const pageSize = 10;
 
   const now = new Date();
   const today      = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -682,7 +688,7 @@ function renderList() {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
   let list = orders.filter(o => {
-    const matchQ   = !q || o.id.toLowerCase().includes(q) || o.items.some(i=>i.name.toLowerCase().includes(q));
+    const matchQ   = !q || o.id.toLowerCase().includes(q) || (Array.isArray(o.items)?o.items:[]).some(i=>i.name.toLowerCase().includes(q));
     const matchPay = payF==='all' || o.payment===payF;
     const d = new Date(o.timestamp);
     let matchDate = true;
@@ -692,23 +698,25 @@ function renderList() {
     return matchQ && matchPay && matchDate;
   });
 
-  if(sortV==='date-desc')  list.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-  if(sortV==='date-asc')   list.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
-  if(sortV==='total-desc') list.sort((a,b)=>b.total-a.total);
-  if(sortV==='total-asc')  list.sort((a,b)=>a.total-b.total);
+  list.sort((a,b) => {
+    let va, vb;
+    if(sortCol==='date')       { va=new Date(a.timestamp); vb=new Date(b.timestamp); }
+    else if(sortCol==='total') { va=a.total; vb=b.total; }
+    else                       { va=a.id; vb=b.id; }
+    return sortDir==='desc' ? (vb>va?1:-1) : (va>vb?1:-1);
+  });
+  updateSortIndicators();
 
-  // Summary cards — always reflect full filtered list
   const sumTotal = list.reduce((s,o)=>s+o.total, 0);
   document.getElementById('sum-count').textContent = list.length;
   document.getElementById('sum-count-sub').textContent = list.length===1 ? '1 order' : `${list.length} orders`;
   document.getElementById('sum-total').textContent = '฿'+sumTotal.toLocaleString();
   document.getElementById('sum-total-sub').textContent = list.length ? `avg ฿${Math.round(sumTotal/list.length)} per order` : '';
 
-  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(list.length/pageSize));
   if(currentPage > totalPages) currentPage = totalPages;
-
-  const start = (currentPage-1) * pageSize;
-  const end   = Math.min(start + pageSize, list.length);
+  const start = (currentPage-1)*pageSize;
+  const end   = Math.min(start+pageSize, list.length);
   const paged = list.slice(start, end);
 
   document.getElementById('list-count').textContent =
@@ -718,15 +726,14 @@ function renderList() {
   const empty = document.getElementById('list-empty');
   const pagBar = document.getElementById('pagination-bar');
 
-  if(!list.length){
-    tbody.innerHTML=''; empty.style.display='block'; pagBar.style.display='none'; return;
-  }
+  if(!list.length){ tbody.innerHTML=''; empty.style.display='block'; pagBar.style.display='none'; return; }
   empty.style.display='none';
-  pagBar.style.display = totalPages > 1 ? 'flex' : 'none';
+  pagBar.style.display = totalPages>1 ? 'flex':'none';
 
   tbody.innerHTML = paged.map(o=>{
     const d = new Date(o.timestamp);
-    const summary = o.items.map(i=>`${i.name} ×${i.qty}`).join(', ');
+    const items = Array.isArray(o.items) ? o.items : [];
+    const summary = items.map(i=>`${i.name} ×${i.qty}`).join(', ');
     const short = summary.length>55 ? summary.slice(0,52)+'…' : summary;
     return `<tr>
       <td class="order-id-cell">${o.id}</td>
@@ -744,11 +751,7 @@ function renderList() {
     </tr>`;
   }).join('');
 
-  // Pagination info
-  document.getElementById('pagination-info').textContent =
-    `Page ${currentPage} of ${totalPages}`;
-
-  // Pagination controls
+  document.getElementById('pagination-info').textContent = `Page ${currentPage} of ${totalPages}`;
   renderPagination(totalPages);
 }
 
@@ -787,11 +790,9 @@ function renderPagination(totalPages) {
 }
 
 function goPage(p) {
-  const pageSize = parseInt(document.getElementById('list-pagesize').value) || 10;
-  const totalPages = Math.ceil(orders.length / pageSize);
+  const totalPages = Math.ceil(orders.length / 10);
   currentPage = Math.max(1, Math.min(p, totalPages));
   renderList();
-  // Scroll list content to top
   document.querySelector('.list-content').scrollTop = 0;
 }
 
@@ -993,28 +994,50 @@ function showToast(msg, type='') {
 }
 
 // ══ MOBILE ══
-function openSidebar(){
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebar-overlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebar-overlay').classList.remove('open');
-  document.body.style.overflow='';
-}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');document.body.style.overflow='';}
 function toggleCart(){
   if(window.innerWidth <= 768)
     document.querySelector('.form-right').classList.toggle('cart-open');
 }
-function updateMobileUI(view) {
+function updateMobileUI(view, param) {
   const title  = document.getElementById('mobile-page-title');
   const newBtn = document.getElementById('mobile-new-order-btn');
-  if(!title) return;
-  if(view==='list')   { title.textContent='Orders';       newBtn.style.display='block'; }
-  else if(view==='new')    { title.textContent='New Order';    newBtn.style.display='none'; }
-  else if(view==='edit')   { title.textContent='Edit Order';   newBtn.style.display='none'; }
-  else if(view==='detail') { title.textContent='Order Detail'; newBtn.style.display='none'; }
+  // Remove any old back/edit buttons
+  ['mobile-back-btn','mobile-edit-btn'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.remove();
+  });
+  const topbar = document.querySelector('.mobile-topbar');
+  if(!title || !topbar) return;
+
+  if(view==='list') {
+    title.textContent='Orders';
+    newBtn.style.display='block';
+  } else if(view==='new') {
+    title.textContent='New Order';
+    newBtn.style.display='none';
+    addMobileBtn(topbar,'mobile-back-btn','← Back','btn-outline',()=>navigate('list'));
+  } else if(view==='edit') {
+    title.textContent='Edit Order';
+    newBtn.style.display='none';
+    addMobileBtn(topbar,'mobile-back-btn','← Back','btn-outline',()=>navigate('list'));
+  } else if(view==='detail') {
+    title.textContent='Order Detail';
+    newBtn.style.display='none';
+    addMobileBtn(topbar,'mobile-back-btn','← Back','btn-outline',()=>navigate('list'));
+    addMobileBtn(topbar,'mobile-edit-btn','✏ Edit','btn-primary',()=>editCurrentOrder());
+  }
+}
+
+function addMobileBtn(topbar, id, label, cls, fn) {
+  const btn = document.createElement('button');
+  btn.id = id;
+  btn.textContent = label;
+  btn.className = `btn ${cls} btn-sm`;
+  btn.style.cssText = 'font-size:0.78rem;padding:0.32rem 0.7rem;white-space:nowrap;';
+  btn.onclick = fn;
+  topbar.appendChild(btn);
 }
 function updateCartBadge() {
   const badge = document.getElementById('cart-count-badge');
