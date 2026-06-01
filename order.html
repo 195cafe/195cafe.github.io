@@ -772,16 +772,21 @@ function renderDetail(order) {
   document.getElementById('detail-order-num').textContent = order.id;
   document.getElementById('detail-order-date').textContent = fmtDate(new Date(order.timestamp));
 
-  document.getElementById('detail-items').innerHTML = order.items.map(i=>`
+  // Safely parse items — Supabase JSONB may need parsing
+  const items = Array.isArray(order.items) ? order.items
+    : (typeof order.items === 'string' ? JSON.parse(order.items) : []);
+
+  document.getElementById('detail-items').innerHTML = items.length ? items.map(i=>`
     <div class="detail-item-row">
       <div class="detail-item-info">
         <div class="detail-item-name">${i.name}</div>
-        <div class="detail-item-meta">${i.type ? i.type+' · ' : ''}${!i.type&&i.sweetness ? i.sweetness : i.type ? (i.sweetness||'Normal') : ''}</div>
+        <div class="detail-item-meta">${i.type ? i.type+' · '+( i.sweetness||'Normal') : (i.sweetness && i.sweetness!=='Normal' ? i.sweetness : '')}</div>
         ${i.note ? `<div class="detail-item-note">📝 ${i.note}</div>` : ''}
       </div>
       <div class="detail-item-qty">×${i.qty}</div>
       <div class="detail-item-subtotal">฿${i.price*i.qty}</div>
-    </div>`).join('');
+    </div>`).join('')
+    : '<div style="color:var(--brown-light);font-size:0.85rem;padding:0.5rem 0;">No items</div>';
 
   document.getElementById('detail-summary').innerHTML = `
     <div class="meta-row"><span class="meta-key">Order #</span><span class="meta-val">${order.id}</span></div>

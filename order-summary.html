@@ -180,7 +180,6 @@ tr.clickable-row:hover td{background:rgba(200,168,130,0.07);}
             <th>Date & Time</th>
             <th>Items</th>
             <th>Payment</th>
-            <th>Status</th>
             <th style="text-align:right;">Total</th>
           </tr></thead>
           <tbody id="orders-tbody"></tbody>
@@ -254,7 +253,10 @@ async function render() {
   const total    = filtered.reduce((s,o)=>s+o.total,0);
   const count    = filtered.length;
   const avg      = count ? Math.round(total/count) : 0;
-  const itemQty  = filtered.reduce((s,o)=>s+o.items.reduce((q,i)=>q+i.qty,0),0);
+  const itemQty  = filtered.reduce((s,o)=>{
+    const items = Array.isArray(o.items) ? o.items : (typeof o.items==='string' ? JSON.parse(o.items) : []);
+    return s + items.reduce((q,i)=>q+i.qty,0);
+  },0);
 
   document.getElementById('stat-revenue').textContent    = '฿'+total.toLocaleString();
   document.getElementById('stat-revenue-sub').textContent= count ? `from ${count} order${count!==1?'s':''}` : 'no orders';
@@ -280,13 +282,16 @@ async function render() {
     </div>`;
   }).join('');
 
-  // Top items
+  // Top items — fix: show type only if not empty, avoid "()"
   const itemMap = {};
-  filtered.forEach(o=>o.items.forEach(i=>{
-    const key=`${i.name} (${i.type})`;
-    itemMap[key]=itemMap[key]||{qty:0,revenue:0};
-    itemMap[key].qty+=i.qty; itemMap[key].revenue+=i.price*i.qty;
-  }));
+  filtered.forEach(o=>{
+    const items = Array.isArray(o.items) ? o.items : (typeof o.items==='string' ? JSON.parse(o.items) : []);
+    items.forEach(i=>{
+      const key = i.type ? `${i.name} (${i.type})` : i.name;
+      itemMap[key]=itemMap[key]||{qty:0,revenue:0};
+      itemMap[key].qty+=i.qty; itemMap[key].revenue+=i.price*i.qty;
+    });
+  });
   const topItems = Object.entries(itemMap).sort((a,b)=>b[1].qty-a[1].qty).slice(0,8);
   const topEl = document.getElementById('top-items');
   if(!topItems.length){ topEl.innerHTML='<div class="empty-state">No orders yet</div>'; }
@@ -298,21 +303,21 @@ async function render() {
       <div class="top-item-rev">฿${data.revenue.toLocaleString()}</div>
     </div>`).join('');
 
-  // Orders table — each row links to order detail
+  // Orders table — no status column
   const sorted = [...filtered].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
   const tbody = document.getElementById('orders-tbody');
   const empty = document.getElementById('orders-empty');
   if(!sorted.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
   tbody.innerHTML = sorted.map(o=>{
-    const summary = o.items.map(i=>`${i.name} ×${i.qty}`).join(', ');
+    const items = Array.isArray(o.items) ? o.items : (typeof o.items==='string' ? JSON.parse(o.items) : []);
+    const summary = items.map(i=>`${i.name} ×${i.qty}`).join(', ');
     const short   = summary.length>55 ? summary.slice(0,52)+'…' : summary;
     return `<tr class="clickable-row" onclick="window.location.href='order.html#detail/${o.id}'">
       <td><span class="order-id-link">${o.id}</span></td>
       <td style="white-space:nowrap;font-size:0.8rem;">${fmtDate(new Date(o.timestamp))}</td>
       <td style="font-size:0.78rem;color:var(--brown-mid);">${short}</td>
       <td><span class="payment-badge">${o.payment||'—'}</span></td>
-      <td><span class="status-badge ${o.paid?'status-paid':'status-unpaid'}">${o.paid?'● Paid':'● Unpaid'}</span></td>
       <td style="text-align:right;font-weight:500;color:var(--espresso);">฿${o.total}</td>
     </tr>`;
   }).join('');
