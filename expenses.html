@@ -26,26 +26,21 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
 .back-btn-side{font-size:0.75rem;color:rgba(247,240,230,0.4);cursor:pointer;background:none;border:none;font-family:"DM Sans",sans-serif;display:flex;align-items:center;gap:0.5rem;}
 .back-btn-side:hover{color:var(--brown-light);}
 
-/* MAIN */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
-
-/* TOPBAR */
 .topbar{background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:10;}
 .topbar-title{font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:500;color:var(--espresso);}
 .topbar-sub{font-size:0.75rem;color:var(--brown-light);margin-top:1px;}
 .topbar-actions{display:flex;gap:0.75rem;}
 
-/* BUTTONS */
 .btn{padding:0.55rem 1.1rem;border-radius:8px;font-size:0.82rem;font-weight:500;cursor:pointer;border:none;font-family:"DM Sans",sans-serif;transition:all 0.15s;display:inline-flex;align-items:center;gap:0.4rem;}
 .btn-primary{background:var(--brown-dark);color:var(--cream);}
 .btn-primary:hover{background:var(--espresso);}
 .btn-outline{background:transparent;color:var(--brown-dark);border:1.5px solid rgba(92,61,30,0.3);}
-.btn-outline:hover{border-color:var(--brown-dark);}
+.btn-outline:hover{border-color:var(--brown-dark);background:rgba(92,61,30,0.05);}
 .btn-danger{background:var(--danger-bg);color:var(--danger);border:1.5px solid rgba(155,34,38,0.2);}
 .btn-danger:hover{background:#ffd0d0;}
 .btn-sm{padding:0.32rem 0.7rem;font-size:0.75rem;}
 
-/* CONTENT */
 .content{padding:1.5rem 2rem;flex:1;}
 
 /* Summary cards */
@@ -55,15 +50,22 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
 .summary-val{font-family:"DM Sans",sans-serif;font-size:1.9rem;font-weight:700;color:var(--espresso);line-height:1;letter-spacing:-0.02em;}
 .summary-sub{font-size:0.72rem;color:var(--brown-mid);margin-top:3px;}
 
-/* Toolbar */
-.toolbar{display:flex;gap:0.6rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;}
-.search-wrap{position:relative;flex:1;min-width:180px;}
-.search-icon{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--brown-light);}
-.search-input{width:100%;padding:0.58rem 1rem 0.58rem 2.2rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.85rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--espresso);outline:none;}
+/* ── REDESIGNED FILTER BAR ── */
+.filter-bar{background:var(--warm-white);border-radius:14px;border:1px solid rgba(200,168,130,0.2);padding:1rem 1.25rem;margin-bottom:1.25rem;}
+.filter-bar-top{display:flex;gap:0.6rem;align-items:center;margin-bottom:0.75rem;}
+.filter-bar-bottom{display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;}
+.filter-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--brown-light);white-space:nowrap;font-weight:500;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-icon{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--brown-light);font-size:0.9rem;}
+.search-input{width:100%;padding:0.55rem 1rem 0.55rem 2.2rem;border:1.5px solid rgba(200,168,130,0.25);border-radius:8px;font-size:0.85rem;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--espresso);outline:none;transition:border-color 0.2s;}
 .search-input:focus{border-color:var(--brown-mid);}
-.filter-select{padding:0.58rem 1rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.82rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--text-body);outline:none;cursor:pointer;}
-.clear-btn{padding:0.55rem 0.9rem;border-radius:8px;border:1.5px solid rgba(200,168,130,0.35);background:transparent;color:var(--brown-mid);font-size:0.78rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;white-space:nowrap;transition:all 0.15s;}
-.clear-btn:hover{background:rgba(200,168,130,0.15);}
+.filter-pill{display:flex;flex-direction:column;gap:2px;}
+.filter-pill-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-light);font-weight:500;}
+.filter-select{padding:0.45rem 0.85rem;border:1.5px solid rgba(200,168,130,0.25);border-radius:8px;font-size:0.8rem;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text-body);outline:none;cursor:pointer;transition:border-color 0.2s;}
+.filter-select:focus{border-color:var(--brown-mid);}
+.filter-divider{width:1px;height:28px;background:rgba(200,168,130,0.2);flex-shrink:0;}
+.clear-btn{padding:0.45rem 0.85rem;border-radius:8px;border:1.5px solid rgba(200,168,130,0.3);background:transparent;color:var(--brown-mid);font-size:0.78rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;white-space:nowrap;transition:all 0.15s;display:flex;align-items:center;gap:4px;}
+.clear-btn:hover{background:rgba(200,168,130,0.12);color:var(--brown-dark);}
 
 /* Table */
 .table-wrap{background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);overflow:hidden;}
@@ -82,7 +84,8 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 .amount-cell{font-family:"DM Sans",sans-serif;font-weight:700;font-size:0.95rem;color:var(--espresso);}
 .receipt-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;cursor:pointer;border:1px solid rgba(200,168,130,0.3);transition:transform 0.15s;}
 .receipt-thumb:hover{transform:scale(1.1);}
-.no-receipt{width:36px;height:36px;border-radius:6px;background:var(--cream);border:1px dashed rgba(200,168,130,0.3);display:flex;align-items:center;justify-content:center;font-size:0.8rem;color:var(--brown-light);}
+.no-receipt{width:36px;height:36px;border-radius:6px;background:var(--cream);border:1px dashed rgba(200,168,130,0.25);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--brown-light);}
+.actions-cell{display:flex;gap:0.4rem;}
 .empty-state{text-align:center;padding:4rem 2rem;color:var(--brown-light);}
 .empty-icon{font-size:2.5rem;margin-bottom:0.75rem;opacity:0.3;}
 
@@ -115,7 +118,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 
 /* Receipt upload */
 .receipt-upload-box{border:2px dashed rgba(200,168,130,0.4);border-radius:10px;padding:1.25rem;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--cream);position:relative;}
-.receipt-upload-box:hover{border-color:var(--brown-mid);background:rgba(200,168,130,0.05);}
+.receipt-upload-box:hover{border-color:var(--brown-mid);}
 .receipt-upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .receipt-preview{width:100%;max-height:180px;object-fit:contain;border-radius:8px;margin-top:0.75rem;display:none;}
 .receipt-upload-label{font-size:0.82rem;color:var(--brown-mid);}
@@ -123,7 +126,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 .remove-photo-btn{margin-top:0.5rem;font-size:0.75rem;color:var(--danger);background:none;border:none;cursor:pointer;font-family:"DM Sans",sans-serif;}
 
 /* LIGHTBOX */
-.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem;}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem;}
 .lightbox.open{display:flex;}
 .lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;object-fit:contain;}
 .lightbox-close{position:absolute;top:1rem;right:1.5rem;color:white;font-size:2rem;cursor:pointer;background:none;border:none;line-height:1;}
@@ -137,7 +140,6 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 </head>
 <body>
 <div id="app">
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-brand-name">195 <span>Café</span></div>
@@ -164,7 +166,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
         <div class="topbar-sub">Track spending on ingredients, supplies and operations</div>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-primary" onclick="openAddModal()">+ Add Expense</button>
+        <button class="btn btn-primary" onclick="openModal()">+ Add Expense</button>
       </div>
     </div>
 
@@ -193,53 +195,77 @@ tr:hover td{background:rgba(200,168,130,0.04);}
         </div>
       </div>
 
-      <!-- Toolbar -->
-      <div class="toolbar">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" class="search-input" id="list-search" placeholder="Search by name or note…" oninput="currentPage=1;renderList()">
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <div class="filter-bar-top">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="list-search" placeholder="Search by name…" oninput="currentPage=1;renderList()">
+          </div>
+          <div class="filter-divider"></div>
+          <div class="filter-pill">
+            <span class="filter-pill-label">Date</span>
+            <select class="filter-select" id="list-date" onchange="currentPage=1;renderList()">
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month" selected>This Month</option>
+              <option value="all">All Dates</option>
+            </select>
+          </div>
+          <div class="filter-pill">
+            <span class="filter-pill-label">Sort by</span>
+            <select class="filter-select" id="list-sort" onchange="currentPage=1;renderList()">
+              <option value="date-desc">Newest First</option>
+              <option value="date-asc">Oldest First</option>
+              <option value="amount-desc">Highest Amount</option>
+              <option value="amount-asc">Lowest Amount</option>
+            </select>
+          </div>
+          <div class="filter-pill">
+            <span class="filter-pill-label">Per page</span>
+            <select class="filter-select" id="list-pagesize" onchange="currentPage=1;renderList()">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <button class="clear-btn" onclick="clearFilters()">✕ Clear</button>
         </div>
-        <select class="filter-select" id="list-cat" onchange="currentPage=1;renderList()">
-          <option value="all">All Categories</option>
-          <option>Ingredients</option>
-          <option>Packaging</option>
-          <option>Rent & Utilities</option>
-          <option>Maintenance</option>
-          <option>Software & Fees</option>
-          <option>Other</option>
-        </select>
-        <select class="filter-select" id="list-payment" onchange="currentPage=1;renderList()">
-          <option value="all">All Payment Methods</option>
-          <option>Cafe Cash</option>
-          <option>Cafe Bank Account</option>
-          <option>Personal Money</option>
-        </select>
-        <select class="filter-select" id="list-paidby" onchange="currentPage=1;renderList()">
-          <option value="all">All Paid By</option>
-          <option>195 Cafe</option>
-          <option>Kiang</option>
-          <option>Rat</option>
-          <option>Ying</option>
-        </select>
-        <select class="filter-select" id="list-date" onchange="currentPage=1;renderList()">
-          <option value="today">Today</option>
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-          <option value="all">All Dates</option>
-        </select>
-        <select class="filter-select" id="list-sort" onchange="currentPage=1;renderList()">
-          <option value="date-desc">Newest First</option>
-          <option value="date-asc">Oldest First</option>
-          <option value="amount-desc">Highest Amount</option>
-          <option value="amount-asc">Lowest Amount</option>
-        </select>
-        <select class="filter-select" id="list-pagesize" onchange="currentPage=1;renderList()">
-          <option value="10">10 / page</option>
-          <option value="20">20 / page</option>
-          <option value="50">50 / page</option>
-          <option value="100">100 / page</option>
-        </select>
-        <button class="clear-btn" onclick="clearFilters()">✕ Clear</button>
+        <div class="filter-bar-bottom">
+          <span class="filter-label">Filter:</span>
+          <div class="filter-pill">
+            <span class="filter-pill-label">Category</span>
+            <select class="filter-select" id="list-cat" onchange="currentPage=1;renderList()">
+              <option value="all">All Categories</option>
+              <option>Ingredients</option>
+              <option>Packaging</option>
+              <option>Rent & Utilities</option>
+              <option>Maintenance</option>
+              <option>Software & Fees</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="filter-pill">
+            <span class="filter-pill-label">Payment</span>
+            <select class="filter-select" id="list-payment" onchange="currentPage=1;renderList()">
+              <option value="all">All Payments</option>
+              <option>Cafe Cash</option>
+              <option>Cafe Bank Account</option>
+              <option>Personal Money</option>
+            </select>
+          </div>
+          <div class="filter-pill">
+            <span class="filter-pill-label">Paid By</span>
+            <select class="filter-select" id="list-paidby" onchange="currentPage=1;renderList()">
+              <option value="all">All</option>
+              <option>195 Cafe</option>
+              <option>Kiang</option>
+              <option>Rat</option>
+              <option>Ying</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <!-- Table -->
@@ -248,8 +274,8 @@ tr:hover td{background:rgba(200,168,130,0.04);}
           <thead><tr>
             <th>Receipt</th>
             <th>Date</th>
-            <th>Name / Detail</th>
             <th>Category</th>
+            <th>Name / Detail</th>
             <th>Payment</th>
             <th>Paid By</th>
             <th style="text-align:right;">Amount</th>
@@ -270,14 +296,15 @@ tr:hover td{background:rgba(200,168,130,0.04);}
   </div>
 </div>
 
-<!-- ADD EXPENSE MODAL -->
+<!-- ADD / EDIT EXPENSE MODAL -->
 <div class="modal-overlay" id="expense-modal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Add Expense</div>
+      <div class="modal-title" id="modal-title">Add Expense</div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
+      <input type="hidden" id="exp-edit-id">
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Paid Date *</label>
@@ -288,10 +315,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
           <input type="number" class="form-input" id="exp-amount" placeholder="0.00" min="0" step="0.01">
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Expense Name / Detail *</label>
-        <input type="text" class="form-input" id="exp-name" placeholder="e.g. Emergency Milk, May Electricity Bill">
-      </div>
+      <!-- Category & Sub-category BEFORE name -->
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Category *</label>
@@ -305,12 +329,16 @@ tr:hover td{background:rgba(200,168,130,0.04);}
             <option>Other</option>
           </select>
         </div>
-        <div class="form-group" id="subcat-group" style="display:none;">
+        <div class="form-group" id="subcat-group" style="visibility:hidden;">
           <label class="form-label">Sub-Category</label>
           <select class="form-select" id="exp-subcat">
             <option value="">Select…</option>
           </select>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Expense Name / Detail *</label>
+        <input type="text" class="form-input" id="exp-name" placeholder="e.g. Emergency Milk, May Electricity Bill">
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -335,7 +363,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
       </div>
       <div class="form-group">
         <label class="form-label">Receipt Photo <span>(optional)</span></label>
-        <div class="receipt-upload-box" id="upload-box" onclick="triggerUpload()">
+        <div class="receipt-upload-box" id="upload-box">
           <input type="file" id="exp-photo" accept="image/*" capture="environment" onchange="handlePhoto(this)">
           <div id="upload-placeholder">
             <div class="receipt-upload-icon">📷</div>
@@ -355,7 +383,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-close">✕</button>
   <img id="lightbox-img" src="" alt="Receipt">
 </div>
 
@@ -372,7 +400,8 @@ const SUBCATS = {
   'Packaging':        ['Cups','Lids','Straws','Bottles','Bags','Other'],
   'Rent & Utilities': ['Rent','Electricity','Water','Internet','Other'],
 };
-const AUTO_CAFE = ['Cafe Cash','Cafe Bank Account'];
+// Payment methods that auto-set Paid By to 195 Cafe
+const CAFE_PAYMENTS = ['Cafe Cash','Cafe Bank Account'];
 
 let expenses    = [];
 let currentPage = 1;
@@ -387,34 +416,33 @@ async function loadExpenses() {
 
 // ══ CASCADING DROPDOWN ══
 function onCatChange() {
-  const cat     = document.getElementById('exp-cat').value;
-  const group   = document.getElementById('subcat-group');
-  const subSel  = document.getElementById('exp-subcat');
-  const subs    = SUBCATS[cat];
+  const cat    = document.getElementById('exp-cat').value;
+  const group  = document.getElementById('subcat-group');
+  const subSel = document.getElementById('exp-subcat');
+  const subs   = SUBCATS[cat];
   if(subs) {
-    group.style.display = '';
+    group.style.visibility = 'visible';
     subSel.innerHTML = '<option value="">Select…</option>'
       + subs.map(s=>`<option>${s}</option>`).join('');
   } else {
-    group.style.display = 'none';
+    group.style.visibility = 'hidden';
     subSel.value = '';
   }
 }
 
 // ══ PAYMENT → PAID BY ══
 function onPaymentChange() {
-  const method  = document.getElementById('exp-payment').value;
-  const paidBy  = document.getElementById('exp-paidby');
-  if(AUTO_CAFE.includes(method)) {
-    paidBy.value = '195 Cafe';
+  const method = document.getElementById('exp-payment').value;
+  // Only auto-set for Cafe Cash / Cafe Bank Account; Personal Money = user picks
+  if(CAFE_PAYMENTS.includes(method)) {
+    document.getElementById('exp-paidby').value = '195 Cafe';
+  } else {
+    // Personal Money — clear so user explicitly picks who paid
+    document.getElementById('exp-paidby').value = '';
   }
 }
 
-// ══ PHOTO UPLOAD ══
-function triggerUpload() {
-  // Handled by input click naturally; stop propagation from remove btn
-}
-
+// ══ PHOTO ══
 function handlePhoto(input) {
   const file = input.files[0]; if(!file) return;
   if(file.size > 5*1024*1024){ showToast('Photo too large — max 5MB','error'); return; }
@@ -422,8 +450,7 @@ function handlePhoto(input) {
   reader.onload = e => {
     receiptB64 = e.target.result;
     const preview = document.getElementById('receipt-preview');
-    preview.src = receiptB64;
-    preview.style.display = 'block';
+    preview.src = receiptB64; preview.style.display = 'block';
     document.getElementById('upload-placeholder').style.display = 'none';
     document.getElementById('remove-photo-btn').style.display = 'block';
   };
@@ -441,27 +468,53 @@ function removePhoto(e) {
 }
 
 // ══ MODAL ══
-function openAddModal() {
+function openModal(editId) {
   receiptB64 = '';
-  document.getElementById('exp-date').value    = todayStr();
-  document.getElementById('exp-name').value    = '';
-  document.getElementById('exp-amount').value  = '';
-  document.getElementById('exp-cat').value     = '';
-  document.getElementById('exp-subcat').value  = '';
-  document.getElementById('exp-payment').value = '';
-  document.getElementById('exp-paidby').value  = '';
-  document.getElementById('exp-photo').value   = '';
-  document.getElementById('receipt-preview').style.display  = 'none';
-  document.getElementById('receipt-preview').src            = '';
+  document.getElementById('exp-photo').value = '';
+  document.getElementById('receipt-preview').style.display = 'none';
+  document.getElementById('receipt-preview').src = '';
   document.getElementById('upload-placeholder').style.display = 'block';
   document.getElementById('remove-photo-btn').style.display = 'none';
-  document.getElementById('subcat-group').style.display     = 'none';
+  document.getElementById('subcat-group').style.visibility = 'hidden';
+
+  if(editId) {
+    const e = expenses.find(x=>x.id===editId);
+    if(!e) return;
+    document.getElementById('modal-title').textContent = 'Edit Expense';
+    document.getElementById('exp-edit-id').value  = e.id;
+    document.getElementById('exp-date').value     = e.date;
+    document.getElementById('exp-amount').value   = e.amount;
+    document.getElementById('exp-cat').value      = e.category||'';
+    onCatChange();
+    document.getElementById('exp-subcat').value   = e.sub_category||'';
+    document.getElementById('exp-name').value     = e.expense_name||e.note||'';
+    document.getElementById('exp-payment').value  = e.payment_method||'';
+    document.getElementById('exp-paidby').value   = e.paid_by||'';
+    if(e.receipt_photo) {
+      receiptB64 = e.receipt_photo;
+      document.getElementById('receipt-preview').src = e.receipt_photo;
+      document.getElementById('receipt-preview').style.display = 'block';
+      document.getElementById('upload-placeholder').style.display = 'none';
+      document.getElementById('remove-photo-btn').style.display = 'block';
+    }
+  } else {
+    document.getElementById('modal-title').textContent = 'Add Expense';
+    document.getElementById('exp-edit-id').value  = '';
+    document.getElementById('exp-date').value     = todayStr();
+    document.getElementById('exp-amount').value   = '';
+    document.getElementById('exp-cat').value      = '';
+    document.getElementById('exp-subcat').value   = '';
+    document.getElementById('exp-name').value     = '';
+    document.getElementById('exp-payment').value  = '';
+    document.getElementById('exp-paidby').value   = '';
+  }
   document.getElementById('expense-modal').classList.add('open');
 }
 
 function closeModal() { document.getElementById('expense-modal').classList.remove('open'); }
 
 async function saveExpense() {
+  const editId  = document.getElementById('exp-edit-id').value;
   const date    = document.getElementById('exp-date').value;
   const name    = document.getElementById('exp-name').value.trim();
   const amount  = parseFloat(document.getElementById('exp-amount').value);
@@ -470,15 +523,14 @@ async function saveExpense() {
   const payment = document.getElementById('exp-payment').value;
   const paidby  = document.getElementById('exp-paidby').value;
 
-  if(!date)         { showToast('Please select a date','error'); return; }
-  if(!name)         { showToast('Please enter expense name','error'); return; }
+  if(!date)          { showToast('Please select a date','error'); return; }
+  if(!name)          { showToast('Please enter expense name','error'); return; }
   if(!amount||amount<=0){ showToast('Please enter a valid amount','error'); return; }
-  if(!cat)          { showToast('Please select a category','error'); return; }
-  if(!payment)      { showToast('Please select payment method','error'); return; }
-  if(!paidby)       { showToast('Please select paid by','error'); return; }
+  if(!cat)           { showToast('Please select a category','error'); return; }
+  if(!payment)       { showToast('Please select payment method','error'); return; }
+  if(!paidby)        { showToast('Please select paid by','error'); return; }
 
   const data = {
-    id:             'exp'+Date.now(),
     date,
     expense_name:   name,
     amount,
@@ -491,9 +543,16 @@ async function saveExpense() {
   };
 
   showToast('Saving…','');
-  const {error} = await db.from('expenses').insert(data);
+  let error;
+  if(editId) {
+    ({error} = await db.from('expenses').update(data).eq('id', editId));
+    if(!error) showToast('Expense updated ✓','success');
+  } else {
+    data.id = 'exp'+Date.now();
+    ({error} = await db.from('expenses').insert(data));
+    if(!error) showToast('Expense saved ✓','success');
+  }
   if(error){ showToast('Error: '+error.message,'error'); return; }
-  showToast('Expense saved ✓','success');
   closeModal();
   await loadExpenses();
   renderList();
@@ -521,7 +580,7 @@ function clearFilters() {
   document.getElementById('list-cat').value      = 'all';
   document.getElementById('list-payment').value  = 'all';
   document.getElementById('list-paidby').value   = 'all';
-  document.getElementById('list-date').value     = 'today';
+  document.getElementById('list-date').value     = 'month';
   document.getElementById('list-sort').value     = 'date-desc';
   document.getElementById('list-pagesize').value = '10';
   currentPage = 1;
@@ -536,8 +595,8 @@ function renderList() {
   const dateF    = document.getElementById('list-date').value;
   const sort     = document.getElementById('list-sort').value;
   const pageSize = parseInt(document.getElementById('list-pagesize').value)||10;
-
   const fromDate = getFromDate(dateF);
+
   let list = expenses.filter(e => {
     const matchQ  = !q || (e.expense_name||'').toLowerCase().includes(q) || (e.note||'').toLowerCase().includes(q);
     const matchC  = cat==='all'     || e.category===cat;
@@ -552,10 +611,9 @@ function renderList() {
   if(sort==='amount-desc') list.sort((a,b)=>b.amount-a.amount);
   if(sort==='amount-asc')  list.sort((a,b)=>a.amount-b.amount);
 
-  // Summary
-  const total      = list.reduce((s,e)=>s+parseFloat(e.amount),0);
-  const count      = list.length;
-  const withReceipt= list.filter(e=>e.receipt_photo).length;
+  const total       = list.reduce((s,e)=>s+parseFloat(e.amount),0);
+  const count       = list.length;
+  const withReceipt = list.filter(e=>e.receipt_photo).length;
   document.getElementById('sum-total').textContent      = '฿'+total.toLocaleString();
   document.getElementById('sum-total-sub').textContent  = count ? `across ${count} records` : 'no records';
   document.getElementById('sum-count').textContent      = count;
@@ -564,7 +622,6 @@ function renderList() {
   document.getElementById('sum-receipt').textContent    = withReceipt;
   document.getElementById('sum-receipt-sub').textContent= count ? `${Math.round(withReceipt/count*100)}% of records` : '';
 
-  // Paginate
   const totalPages = Math.max(1, Math.ceil(list.length/pageSize));
   if(currentPage>totalPages) currentPage=totalPages;
   const start = (currentPage-1)*pageSize;
@@ -580,25 +637,29 @@ function renderList() {
   pagBar.style.display = totalPages>1 ? 'flex':'none';
 
   tbody.innerHTML = paged.map(e=>{
-    const catKey = (e.category||'Other').replace(/[^a-zA-Z]/g,'');
-    const catLabel = e.sub_category ? `${e.category} › ${e.sub_category}` : e.category;
-    const thumb = e.receipt_photo
+    const catKey   = (e.category||'Other').replace(/[^a-zA-Z]/g,'');
+    const catLabel = e.sub_category ? `${e.category} › ${e.sub_category}` : (e.category||'—');
+    const thumb    = e.receipt_photo
       ? `<img class="receipt-thumb" src="${e.receipt_photo}" onclick="openLightbox('${e.receipt_photo}')" alt="receipt">`
       : `<div class="no-receipt">—</div>`;
     return `<tr>
       <td>${thumb}</td>
       <td style="white-space:nowrap;font-size:0.82rem;">${fmtDate(e.date)}</td>
-      <td style="font-weight:500;color:var(--espresso);">${e.expense_name||e.note||'—'}</td>
       <td><span class="cat-badge cat-${catKey}">${catLabel}</span></td>
+      <td style="font-weight:500;color:var(--espresso);">${e.expense_name||e.note||'—'}</td>
       <td style="font-size:0.8rem;color:var(--brown-mid);">${e.payment_method||'—'}</td>
       <td style="font-size:0.8rem;color:var(--brown-mid);">${e.paid_by||'—'}</td>
       <td class="amount-cell" style="text-align:right;">฿${parseFloat(e.amount).toLocaleString()}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">Delete</button></td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-outline btn-sm" onclick="openModal('${e.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">Delete</button>
+        </div>
+      </td>
     </tr>`;
   }).join('');
 
-  document.getElementById('pagination-info').textContent =
-    `Showing ${start+1}–${end} of ${list.length}`;
+  document.getElementById('pagination-info').textContent = `Showing ${start+1}–${end} of ${list.length}`;
   renderPagination(totalPages);
 }
 
@@ -637,7 +698,6 @@ function getFromDate(f){
   if(f==='month') return new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);
   return null;
 }
-
 let toastTimer;
 function showToast(msg,type=''){
   const t=document.getElementById('toast');

@@ -148,7 +148,8 @@ const PAY_COLORS  = {'Cafe Cash':'c-cash','Cafe Bank Account':'c-bank','Personal
 const PB_COLORS   = {'195 Cafe':'c-cafe','Kiang':'c-kiang','Rat':'c-rat','Ying':'c-ying'};
 
 async function loadAndRender() {
-  const { data } = await db.from('expenses').select('*');
+  const { data, error } = await db.from('expenses').select('*');
+  if(error){ console.error('Load error:', error); return; }
   expenses = data || [];
   render();
 }
@@ -162,14 +163,20 @@ function setPeriod(p) {
 
 function getRange() {
   const now   = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString().slice(0,10);
+  const today = now.toISOString().slice(0,10);
   if(period==='today') return { from:today, to:today };
   if(period==='week'){
     const ws = new Date(now); ws.setDate(now.getDate()-now.getDay());
     return { from:ws.toISOString().slice(0,10), to:today };
   }
-  if(period==='month') return { from:new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10), to:today };
-  if(period==='custom') return { from:document.getElementById('date-from').value, to:document.getElementById('date-to').value };
+  if(period==='month'){
+    const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { from:ms.toISOString().slice(0,10), to:today };
+  }
+  if(period==='custom') return {
+    from: document.getElementById('date-from').value,
+    to:   document.getElementById('date-to').value,
+  };
   return { from:today, to:today };
 }
 
