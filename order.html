@@ -350,6 +350,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
           <button class="back-btn" onclick="navigate('list')">← Back</button>
           <div>
             <div class="topbar-title" id="detail-order-num">Order</div>
+            <div style="font-size:0.75rem;color:var(--brown-light);margin-top:2px;" id="detail-order-date"></div>
           </div>
         </div>
         <div class="topbar-actions">
@@ -770,33 +771,38 @@ async function saveOrder() {
 
 // ══ DETAIL ══
 function renderDetail(order) {
-  document.getElementById('detail-order-num').textContent = order.id;
-  document.getElementById('detail-order-date').textContent = fmtDate(new Date(order.timestamp));
+  try {
+    document.getElementById('detail-order-num').textContent = order.id;
+    document.getElementById('detail-order-date').textContent = fmtDate(new Date(order.timestamp));
 
-  // Safely parse items — Supabase JSONB may need parsing
-  const items = Array.isArray(order.items) ? order.items
-    : (typeof order.items === 'string' ? JSON.parse(order.items) : []);
+    // Safely parse items — Supabase JSONB may come as array or string
+    const items = Array.isArray(order.items) ? order.items
+      : (typeof order.items === 'string' ? JSON.parse(order.items) : []);
 
-  document.getElementById('detail-items').innerHTML = items.length ? items.map(i=>`
-    <div class="detail-item-row">
-      <div class="detail-item-info">
-        <div class="detail-item-name">${i.name}</div>
-        <div class="detail-item-meta">${i.type ? i.type+' · '+( i.sweetness||'Normal') : (i.sweetness && i.sweetness!=='Normal' ? i.sweetness : '')}</div>
-        ${i.note ? `<div class="detail-item-note">📝 ${i.note}</div>` : ''}
-      </div>
-      <div class="detail-item-qty">×${i.qty}</div>
-      <div class="detail-item-subtotal">฿${i.price*i.qty}</div>
-    </div>`).join('')
-    : '<div style="color:var(--brown-light);font-size:0.85rem;padding:0.5rem 0;">No items</div>';
+    document.getElementById('detail-items').innerHTML = items.length ? items.map(i=>`
+      <div class="detail-item-row">
+        <div class="detail-item-info">
+          <div class="detail-item-name">${i.name}</div>
+          <div class="detail-item-meta">${i.type ? i.type+' · '+(i.sweetness||'Normal') : (i.sweetness && i.sweetness!=='Normal' ? i.sweetness : '')}</div>
+          ${i.note ? `<div class="detail-item-note">📝 ${i.note}</div>` : ''}
+        </div>
+        <div class="detail-item-qty">×${i.qty}</div>
+        <div class="detail-item-subtotal">฿${i.price*i.qty}</div>
+      </div>`).join('')
+      : '<div style="color:var(--brown-light);font-size:0.85rem;padding:0.5rem 0;">No items</div>';
 
-  document.getElementById('detail-summary').innerHTML = `
-    <div class="meta-row"><span class="meta-key">Order #</span><span class="meta-val">${order.id}</span></div>
-    <div class="meta-row"><span class="meta-key">Date</span><span class="meta-val">${fmtDate(new Date(order.timestamp))}</span></div>
-    <div class="meta-row"><span class="meta-key">Payment</span><span class="meta-val">${order.payment||'—'}</span></div>
-    <div class="grand-total-row">
-      <span class="grand-total-label">Total</span>
-      <span class="grand-total-val">฿${order.total}</span>
-    </div>`;
+    document.getElementById('detail-summary').innerHTML = `
+      <div class="meta-row"><span class="meta-key">Order #</span><span class="meta-val">${order.id}</span></div>
+      <div class="meta-row"><span class="meta-key">Date</span><span class="meta-val">${fmtDate(new Date(order.timestamp))}</span></div>
+      <div class="meta-row"><span class="meta-key">Payment</span><span class="meta-val">${order.payment||'—'}</span></div>
+      <div class="grand-total-row">
+        <span class="grand-total-label">Total</span>
+        <span class="grand-total-val">฿${order.total}</span>
+      </div>`;
+  } catch(err) {
+    showToast('Error rendering order: '+err.message, 'error');
+    console.error('renderDetail error:', err, order);
+  }
 }
 
 function editCurrentOrder()   { if(currentDetailId) navigate(`edit/${currentDetailId}`); }
