@@ -327,6 +327,7 @@ function getRange() {
   }
   if(period === 'month') {
     const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+    // Use end of today as upper bound so today's expenses are included
     return { from: ms.toISOString().slice(0,10), to: todayStr };
   }
   if(period === 'custom') {
@@ -399,9 +400,19 @@ async function render() {
   const range = getRange();
   if(!range.from || !range.to) return;
 
-  const { data: expenses } = await db.from('expenses').select('*')
-    .gte('date', range.from).lte('date', range.to);
-  const list = expenses || [];
+  const { data: expenses, error } = await db.from('expenses').select('*').order('date', { ascending: false });
+  if(error) {
+    console.error('Supabase error:', error);
+    document.getElementById('sc-total').textContent = 'Error';
+    document.getElementById('sc-total-sub').textContent = error.message;
+    return;
+  }
+
+  // Normalise date field — Supabase DATE may return full ISO string
+  const list = (expenses || []).filter(e => {
+    const d = (e.date || '').slice(0, 10); // ensure YYYY-MM-DD
+    return d >= range.from && d <= range.to;
+  });
 
   // ── Scorecards ──
   const total = list.reduce((s,e) => s + parseFloat(e.amount), 0);
@@ -414,7 +425,10 @@ async function render() {
 
   // ── Daily Trend ──
   const dayMap = {};
-  list.forEach(e => { dayMap[e.date] = (dayMap[e.date]||0) + parseFloat(e.amount); });
+  list.forEach(e => {
+    const d = (e.date || '').slice(0,10);
+    dayMap[d] = (dayMap[d]||0) + parseFloat(e.amount);
+  });
   const dayEntries = Object.entries(dayMap).sort((a,b)=>a[0].localeCompare(b[0]));
   const maxDay = Math.max(...dayEntries.map(d=>d[1]), 1);
   const dailyEl = document.getElementById('daily-trend');
