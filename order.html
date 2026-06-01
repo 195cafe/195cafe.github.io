@@ -409,14 +409,23 @@ async function genOrderNumber() {
 function navigate(path) { window.location.hash = path; }
 
 async function loadData() {
-  const [catsRes, itemsRes, ordersRes] = await Promise.all([
-    db.from('categories').select('*').order('sort_order'),
-    db.from('menu_items').select('*'),
-    db.from('orders').select('*').order('timestamp', { ascending: false }),
-  ]);
-  cats      = (catsRes.data||[]).map(c=>({...c, nameTh:c.name_th}));
-  menuItems = (itemsRes.data||[]).map(i=>({...i, nameTh:i.name_th, notesTh:i.notes_th, catId:i.cat_id, photos:i.photos||[]}));
-  orders    = ordersRes.data||[];
+  try {
+    const [catsRes, itemsRes, ordersRes] = await Promise.all([
+      db.from('categories').select('*').order('sort_order'),
+      db.from('menu_items').select('*'),
+      db.from('orders').select('*').order('timestamp', { ascending: false }),
+    ]);
+    if(catsRes.error)  { showToast('Error loading categories: '+catsRes.error.message,'error'); return false; }
+    if(itemsRes.error) { showToast('Error loading menu items: '+itemsRes.error.message,'error'); return false; }
+    if(ordersRes.error){ showToast('Error loading orders: '+ordersRes.error.message,'error'); return false; }
+    cats      = (catsRes.data||[]).map(c=>({...c, nameTh:c.name_th}));
+    menuItems = (itemsRes.data||[]).map(i=>({...i, nameTh:i.name_th, notesTh:i.notes_th, catId:i.cat_id, photos:i.photos||[]}));
+    orders    = ordersRes.data||[];
+    return true;
+  } catch(err) {
+    showToast('Connection error: '+err.message,'error');
+    return false;
+  }
 }
 
 async function handleRoute() {
@@ -436,7 +445,6 @@ async function handleRoute() {
   } else if(view === 'new') {
     document.getElementById('view-form').classList.add('active');
     document.getElementById('form-title').textContent = 'New Order';
-    document.getElementById('form-sub').textContent = 'Select items and fill in details';
     editingOrderId = null;
     cart = [];
     document.getElementById('form-payment').value = '';
@@ -450,7 +458,6 @@ async function handleRoute() {
     if(!order){ navigate('list'); return; }
     document.getElementById('view-form').classList.add('active');
     document.getElementById('form-title').textContent = 'Edit Order';
-    document.getElementById('form-sub').textContent = param;
     editingOrderId = param;
     cart = order.items.map(i=>{
       const cat    = cats.find(c=>c.id===i.itemId ? menuItems.find(m=>m.id===i.itemId)?.catId : null);
@@ -633,6 +640,7 @@ function renderFormMenu() {
 
   const grid = document.getElementById('form-menu-grid');
   const filtered = activeCat==='all' ? menuItems : menuItems.filter(i=>i.catId===activeCat);
+  if(!menuItems.length){ grid.innerHTML='<div style="color:var(--brown-light);font-size:0.85rem;padding:1rem 0;">Loading menu items…</div>'; }
   if(!filtered.length){ grid.innerHTML='<div style="color:var(--brown-light);font-size:0.85rem;padding:0.5rem 0;">No items in this category.</div>'; return; }
   grid.innerHTML = filtered.map(item=>{
     const cat    = cats.find(c=>c.id===item.catId);
