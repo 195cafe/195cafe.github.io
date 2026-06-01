@@ -224,14 +224,14 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
               <div class="scorecard-sub" id="sc-total-sub">0 records</div>
             </div>
             <div class="scorecard">
-              <div class="scorecard-label">Avg per Record
+              <div class="scorecard-label">No. of Expenses
                 <span class="info-wrap" onclick="this.classList.toggle('open')">
                   <span class="info-icon">i</span>
-                  <span class="tooltip">Total Spent ÷ Total Records. Average cost per expense entry.</span>
+                  <span class="tooltip">Total number of expense records in the selected period.</span>
                 </span>
               </div>
-              <div class="scorecard-val" id="sc-avg">฿0</div>
-              <div class="scorecard-sub" id="sc-avg-sub">average</div>
+              <div class="scorecard-val" id="sc-avg">0</div>
+              <div class="scorecard-sub" id="sc-avg-sub">expense records</div>
             </div>
           </div>
           <!-- CATEGORY BARS -->
@@ -490,8 +490,8 @@ async function render() {
   const avg   = count ? Math.round(total / count) : 0;
   document.getElementById('sc-total').textContent     = fmt(total);
   document.getElementById('sc-total-sub').textContent = `${count} record${count!==1?'s':''}`;
-  document.getElementById('sc-avg').textContent       = fmt(avg);
-  document.getElementById('sc-avg-sub').textContent   = count ? `across ${count} records` : 'no records';
+  document.getElementById('sc-avg').textContent       = count;
+  document.getElementById('sc-avg-sub').textContent   = count === 1 ? 'expense record' : 'expense records';
 
   // ── Daily Trend ──
   const dayMap = {};

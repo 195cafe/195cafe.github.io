@@ -819,6 +819,17 @@ function showToast(msg,type=''){
 
 // ─── INIT ────────────────────────────────────────────
 if(localStorage.getItem('cafe195_auth')) loadAll();
+
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
 </script>
 </body>
 </html>

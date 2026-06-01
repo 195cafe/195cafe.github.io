@@ -163,21 +163,54 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 }
 
 @media (max-width: 768px) {
-  .content { padding: 1rem; }
-  .summary-strip { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-  .summary-val { font-size: 1.5rem; }
-  .filter-bar { padding: 0.75rem; }
-  .filter-bar-top, .filter-bar-bottom { gap: 0.4rem; }
-  .filter-divider { display: none; }
-  /* Make table horizontally scrollable */
-  .table-wrap { overflow-x: auto; }
-  table { min-width: 600px; }
-  /* Pagination smaller */
-  .page-btn { min-width: 28px; height: 28px; font-size: 0.75rem; }
+  .content { padding: 0.75rem; }
+
+  /* Summary cards 2x2 */
+  .summary-strip { grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
+  .summary-val { font-size: 1.45rem; }
+  .summary-card { padding: 0.75rem 0.9rem; }
+
+  /* Filter bar — clean grid layout */
+  .filter-bar { padding: 0.75rem; border-radius: 10px; }
+  .filter-bar-top {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .filter-bar-top .search-wrap { grid-column: 1 / -1; }
+  .filter-bar-top .filter-divider { display: none !important; }
+  .filter-bar-top .clear-btn { grid-column: 1 / -1; width: 100%; justify-content: center; }
+  .filter-bar-bottom {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .filter-bar-bottom .filter-label { display: none; }
+  .filter-bar-bottom .filter-pill:last-child { grid-column: 1 / -1; }
+  .filter-pill { display: flex; flex-direction: column; gap: 2px; }
+  .filter-pill-label { font-size: 0.62rem; }
+  .filter-select { font-size: 0.8rem; padding: 0.48rem 0.55rem; width: 100%; }
+  .search-input { font-size: 0.85rem; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 520px; }
+  /* Hide Payment + Paid By on phone to save space */
+  th:nth-child(5), td:nth-child(5),
+  th:nth-child(6), td:nth-child(6) { display: none; }
+
+  /* Pagination */
+  .page-btn { min-width: 30px; height: 30px; font-size: 0.75rem; }
+  .pagination-bar { padding: 0.6rem 0.75rem; flex-wrap: wrap; gap: 0.4rem; }
+
+  /* Modal as bottom sheet */
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal { max-width: 100%; border-radius: 20px 20px 0 0; max-height: 92vh; }
+  .form-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
-  .summary-strip { grid-template-columns: 1fr 1fr; }
-  .summary-val { font-size: 1.4rem; }
+  .summary-val { font-size: 1.3rem; }
 }
 
 @media (max-width: 768px) {
