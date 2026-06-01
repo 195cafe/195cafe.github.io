@@ -43,7 +43,7 @@
   /* MAIN */
   .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
   .topbar{background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-  .topbar-title{font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:500;color:var(--espresso);}
+  .topbar-title{font-family:"Cormorant Garamond",serif;font-size:1.25rem;font-weight:500;color:var(--espresso);}
   .topbar-sub{font-size:0.75rem;color:var(--brown-light);margin-top:1px;}
   .topbar-actions{display:flex;gap:0.75rem;align-items:center;}
   .btn{padding:0.55rem 1.1rem;border-radius:8px;font-size:0.8rem;font-weight:500;cursor:pointer;border:none;font-family:"DM Sans",sans-serif;transition:all 0.15s;display:inline-flex;align-items:center;gap:0.4rem;}
@@ -234,7 +234,6 @@
       <div class="topbar">
         <div>
           <div class="topbar-title">Products & Menu</div>
-          <div class="topbar-sub">Manage items in both English and Thai</div>
         </div>
         <div class="topbar-actions">
           <button class="btn btn-outline" onclick="exportMenu()">⬇ Export</button>
@@ -285,7 +284,7 @@
     <!-- CATEGORIES VIEW -->
     <div id="view-categories" style="display:none;">
       <div class="topbar">
-        <div><div class="topbar-title">Categories</div><div class="topbar-sub">Each category has English & Thai names</div></div>
+        <div><div class="topbar-title">Categories</div></div>
         <div class="topbar-actions"><button class="btn btn-primary" onclick="openAddCatModal()">+ Add Category</button></div>
       </div>
       <div class="content">
