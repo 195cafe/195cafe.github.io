@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>195 Café — Categories</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F7F0E6;--warm-white:#FDF9F4;--brown-light:#C8A882;--brown-mid:#9B7355;--brown-dark:#5C3D1E;--espresso:#2C1A0E;--text-body:#4A3728;--success:#2D6A4F;--success-bg:#D8F3DC;--danger:#9B2226;--danger-bg:#FFE8E8;--sidebar-w:240px;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text-body);}
+#app{display:flex;height:100vh;overflow:hidden;}
+
+.sidebar{width:var(--sidebar-w);background:var(--espresso);color:var(--cream);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sidebar-brand{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sidebar-brand-name{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:600;}
+.sidebar-brand-name span{color:var(--brown-light);}
+.sidebar-brand-sub{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,240,230,0.35);margin-top:2px;}
+.sidebar-section{padding:1rem 0.75rem 0.5rem;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,240,230,0.3);}
+.sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1.25rem;font-size:0.85rem;color:rgba(247,240,230,0.65);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;text-decoration:none;}
+.sidebar-link:hover{background:rgba(255,255,255,0.06);color:var(--cream);}
+.sidebar-link.active{background:rgba(200,168,130,0.15);color:var(--cream);border-left-color:var(--brown-light);}
+.sidebar-link .icon{font-size:1rem;width:20px;text-align:center;}
+.sidebar-footer{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08);}
+.back-btn-side{font-size:0.75rem;color:rgba(247,240,230,0.4);cursor:pointer;background:none;border:none;font-family:"DM Sans",sans-serif;display:flex;align-items:center;gap:0.5rem;}
+.back-btn-side:hover{color:var(--brown-light);}
+
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.topbar{background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;flex-shrink:0;}
+.topbar-title{font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:500;color:var(--espresso);}
+.topbar-sub{font-size:0.75rem;color:var(--brown-light);margin-top:1px;}
+.topbar-actions{display:flex;gap:0.75rem;}
+.content{padding:1.5rem 2rem;flex:1;}
+
+.btn{padding:0.55rem 1.1rem;border-radius:8px;font-size:0.82rem;font-weight:500;cursor:pointer;border:none;font-family:"DM Sans",sans-serif;transition:all 0.15s;display:inline-flex;align-items:center;gap:0.4rem;}
+.btn-primary{background:var(--brown-dark);color:var(--cream);}
+.btn-primary:hover{background:var(--espresso);}
+.btn-outline{background:transparent;color:var(--brown-dark);border:1.5px solid rgba(92,61,30,0.3);}
+.btn-outline:hover{border-color:var(--brown-dark);background:rgba(92,61,30,0.05);}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border:1.5px solid rgba(155,34,38,0.2);}
+.btn-danger:hover{background:#ffd0d0;}
+.btn-sm{padding:0.32rem 0.7rem;font-size:0.75rem;}
+
+/* Summary */
+.summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;}
+.summary-card{background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);padding:1rem 1.25rem;}
+.summary-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.13em;color:var(--brown-light);margin-bottom:4px;}
+.summary-val{font-family:"DM Sans",sans-serif;font-size:2rem;font-weight:700;color:var(--espresso);line-height:1;letter-spacing:-0.02em;}
+.summary-sub{font-size:0.72rem;color:var(--brown-mid);margin-top:3px;}
+
+/* Category list */
+.cat-list{display:flex;flex-direction:column;gap:0.6rem;}
+.cat-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);transition:box-shadow 0.15s;}
+.cat-item:hover{box-shadow:0 2px 12px rgba(92,61,30,0.08);}
+.cat-icon{font-size:1.6rem;width:40px;text-align:center;flex-shrink:0;}
+.cat-names{flex:1;}
+.cat-name-en{font-size:0.95rem;font-weight:600;color:var(--espresso);}
+.cat-name-th{font-size:0.82rem;color:var(--brown-mid);font-family:"Sarabun",sans-serif;margin-top:2px;}
+.cat-count{font-size:0.75rem;color:var(--brown-light);white-space:nowrap;min-width:70px;text-align:center;}
+.cat-order{font-size:0.72rem;color:var(--brown-light);white-space:nowrap;}
+.actions{display:flex;gap:0.4rem;}
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--brown-light);}
+.empty-icon{font-size:2.5rem;margin-bottom:0.75rem;opacity:0.3;}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(44,26,14,0.5);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--warm-white);border-radius:16px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.3);}
+.modal-header{padding:1.1rem 1.5rem;border-bottom:1px solid rgba(200,168,130,0.2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--warm-white);z-index:1;}
+.modal-title{font-family:"Cormorant Garamond",serif;font-size:1.25rem;font-weight:500;color:var(--espresso);}
+.modal-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--brown-light);}
+.modal-body{padding:1.25rem 1.5rem;}
+.modal-footer{padding:0.9rem 1.5rem;border-top:1px solid rgba(200,168,130,0.2);display:flex;gap:0.75rem;justify-content:flex-end;position:sticky;bottom:0;background:var(--warm-white);}
+.form-group{margin-bottom:1rem;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+.form-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);margin-bottom:0.4rem;display:block;font-weight:500;}
+.form-input{width:100%;padding:0.65rem 0.9rem;border:1.5px solid rgba(200,168,130,0.35);border-radius:8px;font-size:0.88rem;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--espresso);outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--brown-mid);}
+.form-input.th{font-family:"Sarabun",sans-serif;font-size:0.92rem;}
+.form-hint{font-size:0.7rem;color:var(--brown-light);margin-top:3px;}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--espresso);color:var(--cream);padding:0.75rem 1.25rem;border-radius:10px;font-size:0.85rem;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--danger);}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">195 <span>Café</span></div>
+      <div class="sidebar-brand-sub">Management System</div>
+    </div>
+    <div class="sidebar-section">Orders</div>
+    <a class="sidebar-link" href="order.html#list"><span class="icon">🧾</span> Orders</a>
+    <div class="sidebar-section">Menu</div>
+    <a class="sidebar-link" href="menu-admin.html"><span class="icon">☕</span> Products & Menu</a>
+    <a class="sidebar-link active" href="categories.html"><span class="icon">📂</span> Categories</a>
+    <div class="sidebar-section">Finance</div>
+    <a class="sidebar-link" href="expenses.html"><span class="icon">💰</span> Expenses</a>
+    <div class="sidebar-section">Reports</div>
+    <a class="sidebar-link" href="order-summary.html"><span class="icon">📊</span> Order Summary</a>
+    <a class="sidebar-link" href="expense-summary.html"><span class="icon">📈</span> Expense Summary</a>
+    <div class="sidebar-footer">
+      <button class="back-btn-side" onclick="window.location.href='menu-admin.html'">⬅ Back to Admin</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Categories</div>
+        <div class="topbar-sub">Manage menu categories in English and Thai</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openModal()">+ Add Category</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="summary-strip">
+        <div class="summary-card">
+          <div class="summary-label">Total Categories</div>
+          <div class="summary-val" id="sum-cats">0</div>
+          <div class="summary-sub">active categories</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Total Items</div>
+          <div class="summary-val" id="sum-items">0</div>
+          <div class="summary-sub">across all categories</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Avg Items</div>
+          <div class="summary-val" id="sum-avg">0</div>
+          <div class="summary-sub">per category</div>
+        </div>
+      </div>
+      <div class="cat-list" id="cat-list"></div>
+      <div id="cat-empty" class="empty-state" style="display:none;">
+        <div class="empty-icon">📂</div>
+        <div>No categories yet — add your first one</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="cat-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Add Category</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">English Name *</label>
+          <input type="text" class="form-input" id="f-name" placeholder="e.g. Coffee">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Thai Name</label>
+          <input type="text" class="form-input th" id="f-name-th" placeholder="เช่น กาแฟ">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Icon (emoji)</label>
+          <input type="text" class="form-input" id="f-icon" placeholder="☕" maxlength="4">
+          <div class="form-hint">One emoji only</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sort Order</label>
+          <input type="number" class="form-input" id="f-sort" placeholder="1" min="0">
+          <div class="form-hint">Lower = appears first</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCategory()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://nczopypmbybjvkxqpxgy.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jem9weXBtYnlianZreHFweGd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMjk3OTcsImV4cCI6MjA5NTgwNTc5N30.IpwzundkVF8nklpGmMnRRQZphe2T72qgWh5liDYxU4E';
+const db = supabase.createClient(SB_URL, SB_KEY);
+
+let cats = [], items = [];
+
+async function loadAll() {
+  const [cRes, iRes] = await Promise.all([
+    db.from('categories').select('*').order('sort_order'),
+    db.from('menu_items').select('id,cat_id'),
+  ]);
+  if(cRes.error || iRes.error){ showToast('Failed to load','error'); return; }
+  cats  = cRes.data || [];
+  items = iRes.data || [];
+  render();
+}
+
+function render() {
+  const total    = cats.length;
+  const itemsTot = items.length;
+  const avg      = total ? Math.round(itemsTot/total) : 0;
+  document.getElementById('sum-cats').textContent  = total;
+  document.getElementById('sum-items').textContent = itemsTot;
+  document.getElementById('sum-avg').textContent   = avg;
+
+  const list  = document.getElementById('cat-list');
+  const empty = document.getElementById('cat-empty');
+  if(!cats.length){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  list.innerHTML = cats.map(c => {
+    const count = items.filter(i=>i.cat_id===c.id).length;
+    return `<div class="cat-item">
+      <div class="cat-icon">${c.icon||'📋'}</div>
+      <div class="cat-names">
+        <div class="cat-name-en">${c.name}</div>
+        <div class="cat-name-th">${c.name_th||'<span style="opacity:0.4;font-family:DM Sans;font-size:0.72rem;">no Thai name</span>'}</div>
+      </div>
+      <div class="cat-count">${count} item${count!==1?'s':''}</div>
+      <div class="cat-order">Order: ${c.sort_order||0}</div>
+      <div class="actions">
+        <button class="btn btn-outline btn-sm" onclick="openModal('${c.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCategory('${c.id}','${c.name}',${count})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openModal(editId) {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('f-name').value    = '';
+  document.getElementById('f-name-th').value = '';
+  document.getElementById('f-icon').value    = '';
+  document.getElementById('f-sort').value    = cats.length + 1;
+  document.getElementById('modal-title').textContent = 'Add Category';
+
+  if(editId) {
+    const c = cats.find(x=>x.id===editId); if(!c) return;
+    document.getElementById('edit-id').value    = c.id;
+    document.getElementById('f-name').value     = c.name;
+    document.getElementById('f-name-th').value  = c.name_th||'';
+    document.getElementById('f-icon').value     = c.icon||'';
+    document.getElementById('f-sort').value     = c.sort_order||0;
+    document.getElementById('modal-title').textContent = 'Edit Category';
+  }
+  document.getElementById('cat-modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('cat-modal').classList.remove('open'); }
+
+async function saveCategory() {
+  const editId  = document.getElementById('edit-id').value;
+  const name    = document.getElementById('f-name').value.trim();
+  const nameTh  = document.getElementById('f-name-th').value.trim();
+  const icon    = document.getElementById('f-icon').value.trim() || '📋';
+  const sort    = parseInt(document.getElementById('f-sort').value) || 0;
+
+  if(!name){ showToast('Please enter an English name','error'); return; }
+
+  const data = { name, name_th: nameTh, icon, sort_order: sort };
+  let error;
+  if(editId){
+    ({error} = await db.from('categories').update(data).eq('id', editId));
+    if(!error) showToast('Category updated ✓','success');
+  } else {
+    data.id = 'c'+Date.now();
+    ({error} = await db.from('categories').insert(data));
+    if(!error) showToast('Category added ✓','success');
+  }
+  if(error){ showToast('Error: '+error.message,'error'); return; }
+  closeModal();
+  await loadAll();
+}
+
+async function deleteCategory(id, name, count) {
+  if(count > 0){ showToast(`Cannot delete — ${count} item(s) use this category`,'error'); return; }
+  if(!confirm(`Delete category "${name}"?`)) return;
+  const {error} = await db.from('categories').delete().eq('id', id);
+  if(error){ showToast('Error: '+error.message,'error'); return; }
+  showToast('Category deleted','error');
+  await loadAll();
+}
+
+let toastTimer;
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.className='toast',2800);
+}
+
+loadAll();
+</script>
+</body>
+</html>
