@@ -192,12 +192,123 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.success{background:var(--success);}
 .toast.error{background:var(--danger);}
+
+/* ══ MOBILE ══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #app { flex-direction: column; height: auto; min-height: 100vh; }
+
+  /* Sidebar slides in */
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; height: 100vh;
+    width: 280px; z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.25);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 199;
+  }
+  .sidebar-overlay.open { display: block; }
+  .mobile-topbar { display: flex !important; }
+  .topbar { display: none !important; }
+  .sidebar-footer { display: none; }
+
+  /* Main fills screen */
+  .main { width: 100%; overflow: visible; }
+  .view { overflow: visible; }
+  .view.active { display: block; }
+
+  /* List view */
+  .list-content { padding: 1rem; }
+  .list-summary { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .summary-val { font-size: 1.6rem; }
+  .toolbar { gap: 0.4rem; }
+  .filter-select { font-size: 0.75rem; padding: 0.5rem 0.6rem; }
+  .table-wrap { overflow-x: auto; }
+  table { min-width: 560px; }
+  .page-btn { min-width: 28px; height: 28px; font-size: 0.75rem; }
+
+  /* Form view — stack menu on top, cart as bottom drawer */
+  .form-layout {
+    display: flex; flex-direction: column;
+    height: auto; overflow: visible;
+  }
+  .form-left {
+    overflow: visible; padding: 1rem;
+    padding-bottom: 280px; /* space for cart drawer */
+  }
+  .menu-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; }
+  .menu-card-photo, .menu-card-photo-placeholder { height: 80px; }
+  .price-chip { font-size: 0.75rem; padding: 4px 8px; min-height: 32px; }
+
+  /* Cart as fixed bottom drawer */
+  .form-right {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 260px; z-index: 50;
+    border-left: none;
+    border-top: 2px solid rgba(200,168,130,0.3);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 24px rgba(92,61,30,0.12);
+    transform: translateY(calc(100% - 52px));
+    transition: transform 0.3s ease;
+  }
+  .form-right.cart-open { transform: translateY(0); }
+
+  /* Cart handle bar to tap and expand */
+  .cart-header {
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+  }
+  .cart-header::after {
+    content: '▲';
+    font-size: 0.7rem;
+    color: var(--brown-light);
+    transition: transform 0.3s;
+  }
+  .form-right.cart-open .cart-header::after { transform: rotate(180deg); }
+
+  /* Cart items fill remaining space */
+  .cart-items-wrap { flex: 1; overflow-y: auto; }
+  .cart-footer { padding: 0.75rem 1rem; }
+  .total-val { font-size: 1.5rem; }
+  .save-btn { padding: 0.75rem; }
+
+  /* Cart item touch-friendly */
+  .qty-btn { width: 32px; height: 32px; font-size: 1rem; }
+  .sweetness-sel { font-size: 0.78rem; padding: 0.3rem 0.5rem; }
+
+  /* Detail view */
+  .detail-content { padding: 1rem; overflow-y: auto; }
+  .detail-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+}
+
+@media (max-width: 480px) {
+  .summary-val { font-size: 1.4rem; }
+  .menu-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+}
+
+@media (min-width: 769px) {
+  .mobile-topbar { display: none !important; }
+  .sidebar-overlay { display: none !important; }
+}
 </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div id="app">
+
+  <!-- MOBILE TOPBAR -->
+  <div class="mobile-topbar" style="display:none;background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:0.65rem 1rem;align-items:center;gap:0.75rem;position:sticky;top:0;z-index:100;flex-shrink:0;">
+    <button onclick="openSidebar()" style="background:none;border:none;cursor:pointer;font-size:1.3rem;padding:4px;color:var(--espresso);width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px;flex-shrink:0;">☰</button>
+    <span id="mobile-page-title" style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:500;color:var(--espresso);flex:1;">Orders</span>
+    <button id="mobile-new-order-btn" onclick="navigate('new')" style="background:var(--brown-dark);color:var(--cream);border:none;padding:0.4rem 0.9rem;border-radius:8px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;">+ New</button>
+  </div>
+
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-brand-name">195 <span>Café</span></div>
       <div class="sidebar-brand-sub">Management System</div>
@@ -319,7 +430,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
           <div class="menu-grid" id="form-menu-grid"></div>
         </div>
         <div class="form-right">
-          <div class="cart-header"><div class="cart-title">Order Items</div></div>
+          <div class="cart-header" onclick="toggleCart()"><div class="cart-title">Order Items <span id="cart-count-badge" style="font-size:0.7rem;background:var(--brown-dark);color:var(--cream);border-radius:10px;padding:1px 7px;margin-left:6px;display:none;">0</span></div></div>
           <div class="cart-items-wrap" id="form-cart-wrap">
             <div class="cart-empty-msg">
               <div class="cart-empty-icon">☕</div>
@@ -441,6 +552,7 @@ async function handleRoute() {
 
   if(view === 'list' || view === '') {
     document.getElementById('view-list').classList.add('active');
+    updateMobileUI('list');
     renderList();
 
   } else if(view === 'new') {
@@ -731,6 +843,7 @@ function renderCart() {
       <textarea class="item-note-input" rows="1" placeholder="Note (optional)…" onchange="setNote('${c.key}',this.value)">${c.note||''}</textarea>
     </div>`).join('');
   document.getElementById('form-total').textContent = '฿'+getTotal();
+  updateCartBadge();
 }
 
 // ══ PAYMENT ══
@@ -828,6 +941,38 @@ function showToast(msg, type='') {
   t.textContent=msg; t.className='toast show '+type;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.className='toast', 2800);
+}
+
+// ══ MOBILE ══
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function toggleCart(){
+  if(window.innerWidth <= 768)
+    document.querySelector('.form-right').classList.toggle('cart-open');
+}
+function updateMobileUI(view) {
+  const title  = document.getElementById('mobile-page-title');
+  const newBtn = document.getElementById('mobile-new-order-btn');
+  if(!title) return;
+  if(view==='list')   { title.textContent='Orders';       newBtn.style.display='block'; }
+  else if(view==='new')    { title.textContent='New Order';    newBtn.style.display='none'; }
+  else if(view==='edit')   { title.textContent='Edit Order';   newBtn.style.display='none'; }
+  else if(view==='detail') { title.textContent='Order Detail'; newBtn.style.display='none'; }
+}
+function updateCartBadge() {
+  const badge = document.getElementById('cart-count-badge');
+  if(!badge) return;
+  const qty = cart.reduce((s,c)=>s+c.qty,0);
+  badge.textContent = qty;
+  badge.style.display = qty > 0 ? 'inline' : 'none';
 }
 </script>
 </body>
