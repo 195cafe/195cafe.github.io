@@ -318,21 +318,30 @@ function setPeriod(p) {
 
 function getRange() {
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayStr = today.toISOString().slice(0,10);
+  // Build date string from local time (not UTC) to avoid timezone shift
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
   if(period === 'today') return { from: todayStr, to: todayStr };
+
   if(period === 'week') {
-    const ws = new Date(today); ws.setDate(today.getDate() - today.getDay());
-    return { from: ws.toISOString().slice(0,10), to: todayStr };
+    const ws = new Date(now);
+    ws.setDate(now.getDate() - now.getDay());
+    const fromStr = `${ws.getFullYear()}-${String(ws.getMonth()+1).padStart(2,'0')}-${String(ws.getDate()).padStart(2,'0')}`;
+    return { from: fromStr, to: todayStr };
   }
+
   if(period === 'month') {
-    const ms = new Date(now.getFullYear(), now.getMonth(), 1);
-    // Use end of today as upper bound so today's expenses are included
-    return { from: ms.toISOString().slice(0,10), to: todayStr };
+    const fromStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+    return { from: fromStr, to: todayStr };
   }
+
   if(period === 'custom') {
-    return { from: document.getElementById('date-from').value, to: document.getElementById('date-to').value };
+    return {
+      from: document.getElementById('date-from').value,
+      to:   document.getElementById('date-to').value,
+    };
   }
+
   return { from: todayStr, to: todayStr };
 }
 
@@ -410,7 +419,7 @@ async function render() {
 
   // Normalise date field — Supabase DATE may return full ISO string
   const list = (expenses || []).filter(e => {
-    const d = (e.date || '').slice(0, 10); // ensure YYYY-MM-DD
+    const d = (e.date || '').slice(0, 10);
     return d >= range.from && d <= range.to;
   });
 
