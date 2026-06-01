@@ -227,13 +227,14 @@ tr:hover td{background:rgba(200,168,130,0.04);}
   .summary-val { font-size: 1.6rem; }
   .toolbar { gap: 0.4rem; }
   .filter-select { font-size: 0.75rem; padding: 0.5rem 0.6rem; }
-  .table-wrap { overflow-x: auto; }
-  table { min-width: 520px; }
-  /* Hide less important columns on phone */
-  th:nth-child(3), td:nth-child(3) { display: none; }
+  .table-wrap { overflow-x: hidden; }
+  table { min-width: unset; width: 100%; }
+  /* Hide Items and Payment columns on mobile */
+  th:nth-child(3), td:nth-child(3),
+  th:nth-child(4), td:nth-child(4) { display: none; }
   .page-btn { min-width: 30px; height: 30px; font-size: 0.75rem; }
-  .actions-cell { flex-direction: row; gap: 0.3rem; flex-wrap: wrap; }
-  .actions-cell .btn { font-size: 0.72rem; padding: 0.28rem 0.5rem; }
+  .actions-cell { flex-direction: row; gap: 0.25rem; flex-wrap: nowrap; }
+  .actions-cell .btn { font-size: 0.7rem; padding: 0.25rem 0.45rem; white-space: nowrap; }
 
   /* ── FORM VIEW ── */
   .form-layout {
