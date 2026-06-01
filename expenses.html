@@ -221,7 +221,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
 }
 
 /* ── DETAIL VIEW ── */
-.view { display:none; flex-direction:column; }
+.view { display:none; flex:1; overflow-y:auto; flex-direction:column; }
 .view.active { display:flex !important; }
 .detail-panel { background:var(--warm-white);border-radius:14px;border:1px solid rgba(200,168,130,0.2);overflow:hidden;margin-bottom:1rem; }
 .detail-panel-head { padding:0.9rem 1.25rem;border-bottom:1px solid rgba(200,168,130,0.15);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--brown-mid); }
@@ -266,6 +266,8 @@ tr:hover td{background:rgba(200,168,130,0.04);}
   </div>
 
   <div class="main">
+
+    <div class="view active" id="view-list">
     <div class="topbar">
       <div>
         <div class="topbar-title">Expenses</div>
@@ -274,8 +276,7 @@ tr:hover td{background:rgba(200,168,130,0.04);}
         <button class="btn btn-primary" onclick="openModal()">+ Add Expense</button>
       </div>
     </div>
-
-    <div class="view active" id="view-list"><div class="content">
+    <div class="content">
       <!-- Summary cards -->
       <div class="summary-strip">
         <div class="summary-card">
@@ -377,8 +378,10 @@ tr:hover td{background:rgba(200,168,130,0.04);}
       </div>
     </div>
 
+    </div><!-- end view-list -->
+
     <!-- ══ DETAIL VIEW ══ -->
-    <div class="view" id="view-detail" style="display:none;flex-direction:column;overflow-y:auto;">
+    <div class="view" id="view-detail">
       <div class="topbar">
         <div style="display:flex;align-items:center;gap:0.75rem;">
           <button class="btn btn-outline btn-sm" onclick="navigate('list')">← Back</button>
@@ -393,8 +396,8 @@ tr:hover td{background:rgba(200,168,130,0.04);}
         <!-- populated by renderExpenseDetail() -->
       </div>
     </div>
-    </div><!-- end view-list -->
-  </div>
+  </div><!-- end main -->
+
 </div>
 
 <!-- ADD / EDIT EXPENSE MODAL -->
