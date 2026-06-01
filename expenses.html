@@ -358,8 +358,8 @@ tr:hover td{background:rgba(200,168,130,0.04);}
           <thead><tr>
             <th>Receipt</th>
             <th onclick="setSort('date')" style="cursor:pointer;user-select:none;">Date <span id="esort-date">↓</span></th>
-            <th>Category</th>
             <th>Name / Detail</th>
+            <th>Category</th>
             <th>Payment</th>
             <th>Paid By</th>
             <th onclick="setSort('amount')" style="cursor:pointer;user-select:none;text-align:right;">Amount <span id="esort-amount"></span></th>
@@ -873,8 +873,8 @@ function renderList() {
     return `<tr>
       <td>${thumb}</td>
       <td style="white-space:nowrap;font-size:0.82rem;">${fmtDate(e.date)}</td>
-      <td><span class="cat-badge cat-${catKey}">${catLabel}</span></td>
       <td style="font-weight:500;color:var(--espresso);">${e.expense_name||e.note||'—'}</td>
+      <td><span class="cat-badge cat-${catKey}">${catLabel}</span></td>
       <td style="font-size:0.8rem;color:var(--brown-mid);">${e.payment_method||'—'}</td>
       <td style="font-size:0.8rem;color:var(--brown-mid);">${e.paid_by||'—'}</td>
       <td class="amount-cell" style="text-align:right;">฿${parseFloat(e.amount).toLocaleString()}</td>
