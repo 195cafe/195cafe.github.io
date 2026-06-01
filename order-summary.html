@@ -6,7 +6,7 @@
 <title>195 Café — Order Summary</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--cream:#F7F0E6;--warm-white:#FDF9F4;--brown-light:#C8A882;--brown-mid:#9B7355;--brown-dark:#5C3D1E;--espresso:#2C1A0E;--gold:#D4A853;--text-body:#4A3728;--success:#2D6A4F;--success-bg:#D8F3DC;--danger:#9B2226;--danger-bg:#FFE8E8;--sidebar-w:240px;}
+:root{--cream:#F7F0E6;--warm-white:#FDF9F4;--brown-light:#C8A882;--brown-mid:#9B7355;--brown-dark:#5C3D1E;--espresso:#2C1A0E;--text-body:#4A3728;--success:#2D6A4F;--success-bg:#D8F3DC;--danger:#9B2226;--sidebar-w:240px;}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text-body);}
 #app{display:flex;height:100vh;overflow:hidden;}
@@ -14,7 +14,7 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
 /* SIDEBAR */
 .sidebar{width:var(--sidebar-w);background:var(--espresso);color:var(--cream);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
 .sidebar-brand{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);}
-.sidebar-brand-name{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:600;color:var(--cream);}
+.sidebar-brand-name{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:600;}
 .sidebar-brand-name span{color:var(--brown-light);}
 .sidebar-brand-sub{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,240,230,0.35);margin-top:2px;}
 .sidebar-section{padding:1rem 0.75rem 0.5rem;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,240,230,0.3);}
@@ -28,73 +28,111 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
 
 /* MAIN */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
-.topbar{background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:0.6rem 1.5rem;position:sticky;top:0;z-index:10;flex-shrink:0;}
+.topbar{background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:0.6rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;flex-shrink:0;}
 .topbar-title{font-family:"Cormorant Garamond",serif;font-size:1.25rem;font-weight:500;color:var(--espresso);}
-.topbar-sub{font-size:0.75rem;color:var(--brown-light);margin-top:2px;}
-.content{padding:1.5rem 2rem;flex:1;}
+.content{padding:1.25rem 1.5rem;flex:1;}
 
-/* FILTER BAR */
-.filter-bar{display:flex;gap:0.6rem;margin-bottom:2rem;flex-wrap:wrap;align-items:center;}
-.period-btn{padding:0.5rem 1.1rem;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;border:1.5px solid rgba(200,168,130,0.3);background:var(--warm-white);color:var(--brown-mid);transition:all 0.15s;font-family:"DM Sans",sans-serif;}
+/* PERIOD FILTER */
+.period-bar{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
+.period-btn{padding:0.42rem 0.95rem;border-radius:20px;font-size:0.8rem;font-weight:500;cursor:pointer;border:1.5px solid rgba(200,168,130,0.3);background:var(--warm-white);color:var(--brown-mid);transition:all 0.15s;font-family:"DM Sans",sans-serif;}
 .period-btn:hover,.period-btn.active{background:var(--brown-dark);color:var(--cream);border-color:var(--brown-dark);}
 .date-inputs{display:flex;gap:0.5rem;align-items:center;}
-.date-input{padding:0.48rem 0.8rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.8rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--text-body);outline:none;cursor:pointer;}
-.date-input:focus{border-color:var(--brown-mid);}
+.date-input{padding:0.42rem 0.8rem;border:1.5px solid rgba(200,168,130,0.3);border-radius:8px;font-size:0.8rem;font-family:"DM Sans",sans-serif;background:var(--warm-white);color:var(--text-body);outline:none;}
 .date-sep{font-size:0.8rem;color:var(--brown-light);}
-.apply-btn{padding:0.5rem 1rem;border-radius:8px;background:var(--brown-dark);color:var(--cream);border:none;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;}
-.apply-btn:hover{background:var(--espresso);}
+.apply-btn{padding:0.42rem 0.9rem;border-radius:8px;background:var(--brown-dark);color:var(--cream);border:none;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;}
 
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
-.stat-card{background:var(--warm-white);border-radius:14px;padding:1.25rem 1.5rem;border:1px solid rgba(200,168,130,0.2);}
-.stat-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--brown-light);margin-bottom:0.5rem;}
-.stat-val{font-family:"DM Sans",sans-serif;font-size:2.2rem;font-weight:700;color:var(--espresso);line-height:1;letter-spacing:-0.02em;}
-.stat-sub{font-size:0.75rem;color:var(--brown-mid);margin-top:5px;}
+/* TOOLTIP */
+.info-wrap{position:relative;display:inline-flex;align-items:center;margin-left:5px;cursor:pointer;}
+.info-icon{width:15px;height:15px;border-radius:50%;background:rgba(200,168,130,0.35);color:var(--brown-mid);font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;user-select:none;}
+.tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--espresso);color:var(--cream);font-size:0.72rem;padding:0.5rem 0.75rem;border-radius:8px;white-space:nowrap;max-width:220px;white-space:normal;line-height:1.4;z-index:50;pointer-events:none;opacity:0;transition:opacity 0.15s;}
+.tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--espresso);}
+.info-wrap:hover .tooltip,.info-wrap.open .tooltip{opacity:1;}
 
-/* TWO COL */
-.section-title{font-family:"Cormorant Garamond",serif;font-size:1.2rem;font-weight:500;color:var(--espresso);margin-bottom:1rem;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2rem;}
-.panel{background:var(--warm-white);border-radius:14px;padding:1.5rem;border:1px solid rgba(200,168,130,0.2);}
+/* SCORECARDS */
+.scorecards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.scorecard{background:var(--warm-white);border-radius:14px;border:1px solid rgba(200,168,130,0.2);padding:1.1rem 1.25rem;}
+.scorecard-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.13em;color:var(--brown-light);margin-bottom:4px;display:flex;align-items:center;}
+.scorecard-val{font-family:"DM Sans",sans-serif;font-size:2rem;font-weight:700;color:var(--espresso);line-height:1;letter-spacing:-0.02em;}
+.scorecard-sub{font-size:0.72rem;color:var(--brown-mid);margin-top:4px;}
 
-/* PAYMENT BREAKDOWN */
-.payment-row{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid rgba(200,168,130,0.12);}
-.payment-row:last-child{border-bottom:none;}
-.payment-row-label{display:flex;align-items:center;gap:0.6rem;font-size:0.88rem;font-weight:500;color:var(--espresso);min-width:90px;}
-.payment-row-bar-wrap{flex:1;height:6px;background:rgba(200,168,130,0.2);border-radius:3px;overflow:hidden;}
-.payment-row-bar{height:100%;background:var(--brown-mid);border-radius:3px;transition:width 0.4s ease;}
-.payment-row-count{font-size:0.72rem;color:var(--brown-light);min-width:54px;text-align:right;}
-.payment-row-val{font-size:0.88rem;font-weight:500;color:var(--espresso);min-width:64px;text-align:right;}
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;gap:0.5rem;margin:1.5rem 0 1rem;}
+.section-title{font-family:"Cormorant Garamond",serif;font-size:1.3rem;font-weight:500;color:var(--espresso);}
+.section-divider{flex:1;height:1px;background:rgba(200,168,130,0.2);}
 
-/* TOP ITEMS */
-.top-item-row{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 0;border-bottom:1px solid rgba(200,168,130,0.1);}
-.top-item-row:last-child{border-bottom:none;}
-.top-item-rank{font-family:"Cormorant Garamond",serif;font-size:1.1rem;color:var(--brown-light);min-width:28px;}
-.top-item-name{flex:1;font-size:0.88rem;font-weight:500;color:var(--espresso);}
-.top-item-qty{font-size:0.78rem;color:var(--brown-mid);min-width:52px;text-align:right;}
-.top-item-rev{font-size:0.88rem;font-weight:500;color:var(--espresso);min-width:64px;text-align:right;}
+/* PANELS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.panel{background:var(--warm-white);border-radius:14px;padding:1.25rem;border:1px solid rgba(200,168,130,0.2);}
+.panel-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--brown-mid);margin-bottom:1rem;display:flex;align-items:center;gap:4px;}
+
+/* BAR ROWS */
+.bar-row{display:flex;align-items:center;gap:0.75rem;padding:0.55rem 0;border-bottom:1px solid rgba(200,168,130,0.08);}
+.bar-row:last-child{border-bottom:none;}
+.bar-label{font-size:0.83rem;font-weight:500;color:var(--espresso);min-width:150px;display:flex;align-items:center;gap:5px;}
+.bar-label-sub{font-size:0.7rem;color:var(--brown-light);font-weight:400;}
+.bar-track{flex:1;height:7px;background:rgba(200,168,130,0.15);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
+.fill-brown{background:var(--brown-mid);}
+.fill-cash{background:#10B981;}
+.fill-qr{background:#3B82F6;}
+.bar-val{font-size:0.85rem;font-weight:700;color:var(--espresso);min-width:55px;text-align:right;}
+.bar-count{font-size:0.7rem;color:var(--brown-light);min-width:50px;text-align:right;}
+
+/* DRINK INSIGHTS */
+.drink-item{padding:0.85rem 0;border-bottom:1px solid rgba(200,168,130,0.1);}
+.drink-item:last-child{border-bottom:none;}
+.drink-item-top{display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.4rem;}
+.drink-rank{font-family:"Cormorant Garamond",serif;font-size:1rem;color:var(--brown-light);min-width:28px;}
+.drink-name{font-size:0.88rem;font-weight:600;color:var(--espresso);flex:1;}
+.drink-sold{font-size:0.75rem;color:var(--brown-mid);}
+.drink-rev{font-size:0.88rem;font-weight:700;color:var(--espresso);}
+.sweetness-bar-wrap{display:flex;height:6px;border-radius:4px;overflow:hidden;margin-left:28px;}
+.sweetness-labels{display:flex;gap:0.75rem;margin-left:28px;margin-top:3px;flex-wrap:wrap;}
+.sw-label{font-size:0.68rem;color:var(--brown-mid);display:flex;align-items:center;gap:3px;}
+.sw-dot{width:8px;height:8px;border-radius:50%;}
+.sw-more{background:#F59E0B;}
+.sw-normal{background:#10B981;}
+.sw-less{background:#3B82F6;}
+.sw-none{background:#9CA3AF;}
+
+/* QUICK TRENDS */
+.trend-row{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid rgba(200,168,130,0.1);}
+.trend-row:last-child{border-bottom:none;}
+.trend-label{font-size:0.83rem;color:var(--brown-mid);display:flex;align-items:center;gap:5px;}
+.trend-val{font-size:0.83rem;font-weight:500;color:var(--espresso);}
+.trend-split{display:flex;gap:0.75rem;}
+/* FOOD */.food-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0;border-bottom:1px solid rgba(200,168,130,0.1);}
+.food-item:last-child{border-bottom:none;}
+.food-rank{font-family:"Cormorant Garamond",serif;font-size:1rem;color:var(--brown-light);min-width:28px;}
+.food-name{flex:1;font-size:0.88rem;font-weight:600;color:var(--espresso);}
+.food-sold{font-size:0.75rem;color:var(--brown-mid);}
+.food-rev{font-size:0.88rem;font-weight:700;color:var(--espresso);}
 
 /* ORDERS TABLE */
-.table-wrap{background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);overflow:hidden;margin-bottom:2rem;}
+.table-wrap{background:var(--warm-white);border-radius:12px;border:1px solid rgba(200,168,130,0.2);overflow:hidden;margin-bottom:1.5rem;}
 table{width:100%;border-collapse:collapse;}
 thead{background:rgba(92,61,30,0.05);}
-th{padding:0.75rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);font-weight:500;}
-td{padding:0.8rem 1rem;font-size:0.85rem;border-top:1px solid rgba(200,168,130,0.12);vertical-align:middle;}
-tr.clickable-row{cursor:pointer;}
-tr.clickable-row:hover td{background:rgba(200,168,130,0.07);}
-.order-id-link{font-family:"DM Sans",sans-serif;font-size:0.9rem;font-weight:700;color:var(--brown-dark);text-decoration:underline;text-underline-offset:3px;cursor:pointer;letter-spacing:-0.01em;}
-.order-id-link:hover{color:var(--espresso);}
-.payment-badge{display:inline-flex;font-size:0.72rem;padding:3px 10px;border-radius:10px;font-weight:500;background:rgba(200,168,130,0.15);color:var(--brown-mid);}
-.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;padding:3px 10px;border-radius:10px;font-weight:500;}
-.status-unpaid{background:var(--danger-bg);color:var(--danger);}
-.status-paid{background:var(--success-bg);color:var(--success);}
+th{padding:0.7rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);font-weight:500;}
+td{padding:0.75rem 1rem;font-size:0.85rem;border-top:1px solid rgba(200,168,130,0.12);vertical-align:middle;}
+tr.clickable:hover td{background:rgba(200,168,130,0.06);cursor:pointer;}
+.order-id-link{font-family:"DM Sans",sans-serif;font-size:0.88rem;font-weight:700;color:var(--brown-dark);text-decoration:underline;text-underline-offset:3px;}
+.payment-badge{display:inline-flex;font-size:0.7rem;padding:2px 9px;border-radius:10px;font-weight:500;background:rgba(200,168,130,0.15);color:var(--brown-mid);}
+/* PIE CHARTS */
+.pie-charts-wrap{display:flex;flex-direction:column;gap:1.75rem;}
+.pie-chart-block{display:flex;flex-direction:column;align-items:center;gap:0.65rem;width:100%;}
+.pie-chart-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown-mid);font-weight:500;display:flex;align-items:center;gap:4px;}
+.pie-legend{display:flex;flex-wrap:wrap;gap:0.5rem 1.25rem;width:100%;justify-content:center;}
+.pie-legend-row{display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;color:var(--text-body);}
+.pie-legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.pie-legend-name{color:var(--brown-mid);}
+.pie-legend-pct{font-weight:700;color:var(--espresso);white-space:nowrap;}
 .empty-state{text-align:center;padding:3rem;color:var(--brown-light);font-size:0.88rem;}
 
-@media(max-width:900px){.stats-grid{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}}
+@media(max-width:1000px){.scorecards{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 <div id="app">
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-brand-name">195 <span>Café</span></div>
@@ -121,70 +159,136 @@ tr.clickable-row:hover td{background:rgba(200,168,130,0.07);}
     </div>
     <div class="content">
 
-      <!-- FILTER BAR -->
-      <div class="filter-bar">
-        <button class="period-btn active" data-period="today"  onclick="setPeriod('today')">Today</button>
-        <button class="period-btn"        data-period="week"   onclick="setPeriod('week')">This Week</button>
-        <button class="period-btn"        data-period="month"  onclick="setPeriod('month')">This Month</button>
-        <button class="period-btn"        data-period="custom" onclick="setPeriod('custom')">Custom Range</button>
+      <!-- PERIOD FILTER -->
+      <div class="period-bar">
+        <button class="period-btn active" data-p="today"  onclick="setPeriod('today')">Today</button>
+        <button class="period-btn"        data-p="week"   onclick="setPeriod('week')">This Week</button>
+        <button class="period-btn"        data-p="month"  onclick="setPeriod('month')">This Month</button>
+        <button class="period-btn"        data-p="custom" onclick="setPeriod('custom')">Custom Range</button>
         <div class="date-inputs" id="custom-inputs" style="display:none;">
           <input type="date" class="date-input" id="date-from">
           <span class="date-sep">→</span>
           <input type="date" class="date-input" id="date-to">
-          <button class="apply-btn" onclick="applyCustom()">Apply</button>
+          <button class="apply-btn" onclick="render()">Apply</button>
         </div>
       </div>
 
-      <!-- STAT CARDS -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Total Revenue</div>
-          <div class="stat-val" id="stat-revenue">฿0</div>
-          <div class="stat-sub" id="stat-revenue-sub"></div>
+      <!-- PART 1: SCORECARDS -->
+      <div class="scorecards">
+        <div class="scorecard">
+          <div class="scorecard-label">Total Revenue
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Sum of all order totals in the selected period.</span>
+            </span>
+          </div>
+          <div class="scorecard-val" id="sc-revenue">฿0</div>
+          <div class="scorecard-sub" id="sc-revenue-sub">from 0 orders</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Orders</div>
-          <div class="stat-val" id="stat-orders">0</div>
-          <div class="stat-sub" id="stat-orders-sub"></div>
+        <div class="scorecard">
+          <div class="scorecard-label">Total Orders
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Number of orders placed in the selected period.</span>
+            </span>
+          </div>
+          <div class="scorecard-val" id="sc-orders">0</div>
+          <div class="scorecard-sub" id="sc-orders-sub">avg 0 items per order</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Avg. Order Value</div>
-          <div class="stat-val" id="stat-avg">฿0</div>
-          <div class="stat-sub">per order</div>
+        <div class="scorecard">
+          <div class="scorecard-label">Avg. Order Value
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Total Revenue ÷ Total Orders. How much each order is worth on average.</span>
+            </span>
+          </div>
+          <div class="scorecard-val" id="sc-avg">฿0</div>
+          <div class="scorecard-sub">per order</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Items Sold</div>
-          <div class="stat-val" id="stat-items">0</div>
-          <div class="stat-sub">total items</div>
+        <div class="scorecard">
+          <div class="scorecard-label">Total Items Sold
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Total quantity of all items across all orders in this period.</span>
+            </span>
+          </div>
+          <div class="scorecard-val" id="sc-items">0</div>
+          <div class="scorecard-sub">items sold</div>
         </div>
       </div>
 
-      <!-- PAYMENT + TOP ITEMS -->
+      <!-- PART 1B: PAYMENT & CATEGORY -->
       <div class="two-col">
         <div class="panel">
-          <div class="section-title">Payment Breakdown</div>
-          <div id="payment-breakdown"><div class="empty-state">No orders yet</div></div>
+          <div class="panel-title">Payment Methods
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Revenue and order count broken down by how customers paid.</span>
+            </span>
+          </div>
+          <div id="payment-breakdown"><div class="empty-state">No data</div></div>
         </div>
         <div class="panel">
-          <div class="section-title">Top Items</div>
-          <div id="top-items"><div class="empty-state">No orders yet</div></div>
+          <div class="panel-title">Category Revenue
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Revenue from each menu category. Matched from your categories table.</span>
+            </span>
+          </div>
+          <div id="category-breakdown"><div class="empty-state">No data</div></div>
         </div>
       </div>
 
-      <!-- ORDERS IN PERIOD -->
-      <div class="section-title">Orders in Period</div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>Order #</th>
-            <th>Date & Time</th>
-            <th>Items</th>
-            <th>Payment</th>
-            <th style="text-align:right;">Total</th>
-          </tr></thead>
-          <tbody id="orders-tbody"></tbody>
-        </table>
-        <div id="orders-empty" class="empty-state">No orders in this period</div>
+      <!-- PART 2: DRINK INSIGHTS -->
+      <div class="section-header">
+        <span class="section-title">☕ Drink Insights</span>
+        <div class="section-divider"></div>
+      </div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-title">Top Drink Menus
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Most sold drinks ranked by quantity. Includes sweetness breakdown per drink.</span>
+            </span>
+          </div>
+          <div id="top-drinks"><div class="empty-state">No drink orders yet</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Quick Drink Trends
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Aggregate temperature and sweetness preferences across all drink orders.</span>
+            </span>
+          </div>
+          <div id="drink-trends"><div class="empty-state">No drink orders yet</div></div>
+        </div>
+      </div>
+
+      <!-- PART 3: FOOD INSIGHTS -->
+      <div class="section-header">
+        <span class="section-title">🍞 Food Insights</span>
+        <div class="section-divider"></div>
+      </div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-title">Top Food Menus
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">Most sold food items ranked by quantity sold.</span>
+            </span>
+          </div>
+          <div id="top-food"><div class="empty-state">No food orders yet</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Food Pairing Trends
+            <span class="info-wrap" onclick="this.classList.toggle('open')">
+              <span class="info-icon">i</span>
+              <span class="tooltip">How often food is ordered alongside drinks, and which drink pairs most with food.</span>
+            </span>
+          </div>
+          <div id="food-trends"><div class="empty-state">No food orders yet</div></div>
+        </div>
       </div>
 
     </div>
@@ -197,44 +301,41 @@ const SB_URL = 'https://nczopypmbybjvkxqpxgy.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jem9weXBtYnlianZreHFweGd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMjk3OTcsImV4cCI6MjA5NTgwNTc5N30.IpwzundkVF8nklpGmMnRRQZphe2T72qgWh5liDYxU4E';
 const db = supabase.createClient(SB_URL, SB_KEY);
 
-let period   = 'today';
-let fromDate = null, toDate = null;
+let allOrders = [], menuItems = [], cats = [];
+let period = 'today';
 
+// ══ PERIOD ══
 function setPeriod(p) {
   period = p;
-  document.querySelectorAll('.period-btn').forEach(b=>b.classList.toggle('active',b.dataset.period===p));
-  document.getElementById('custom-inputs').style.display = p==='custom' ? 'flex' : 'none';
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b.dataset.p === p));
+  document.getElementById('custom-inputs').style.display = p === 'custom' ? 'flex' : 'none';
   if(p !== 'custom') render();
-}
-
-function applyCustom() {
-  fromDate = document.getElementById('date-from').value;
-  toDate   = document.getElementById('date-to').value;
-  if(!fromDate||!toDate){ alert('Please select both dates.'); return; }
-  render();
 }
 
 function getRange() {
   const now   = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  if(period==='today') return { from:today, to:new Date(today.getTime()+86400000-1) };
-  if(period==='week'){
-    const ws = new Date(today); ws.setDate(today.getDate()-today.getDay());
-    return { from:ws, to:new Date(ws.getTime()+7*86400000-1) };
+  const todayStr = today.toISOString().slice(0,10);
+  if(period === 'today') return { from: today, to: new Date(today.getTime() + 86400000 - 1) };
+  if(period === 'week') {
+    const ws = new Date(today); ws.setDate(today.getDate() - today.getDay());
+    return { from: ws, to: new Date(ws.getTime() + 7*86400000 - 1) };
   }
-  if(period==='month'){
-    return { from:new Date(now.getFullYear(),now.getMonth(),1), to:new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59) };
+  if(period === 'month') {
+    return { from: new Date(now.getFullYear(), now.getMonth(), 1), to: new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59) };
   }
-  if(period==='custom'&&fromDate&&toDate) return { from:new Date(fromDate), to:new Date(toDate+'T23:59:59') };
-  return { from:today, to:new Date(today.getTime()+86400000-1) };
+  if(period === 'custom') {
+    const f = document.getElementById('date-from').value;
+    const t = document.getElementById('date-to').value;
+    if(!f || !t) return null;
+    return { from: new Date(f), to: new Date(t + 'T23:59:59') };
+  }
+  return { from: today, to: new Date(today.getTime() + 86400000 - 1) };
 }
 
-function getPeriodLabel() {
-  if(period==='today')  return "Today's summary";
-  if(period==='week')   return "This week's summary";
-  if(period==='month')  return "This month's summary";
-  if(period==='custom'&&fromDate&&toDate) return `${fromDate} → ${toDate}`;
-  return 'Summary';
+// ══ HELPERS ══
+function safeItems(o) {
+  return Array.isArray(o.items) ? o.items : (typeof o.items === 'string' ? JSON.parse(o.items) : []);
 }
 
 function fmtDate(d) {
@@ -242,91 +343,341 @@ function fmtDate(d) {
        + ' ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 }
 
-async function render() {
-  const { data: orders, error } = await db.from('orders').select('*');
-  if(error){ console.error(error); return; }
-  const range  = getRange();
-  const filtered = orders.filter(o=>{ const d=new Date(o.timestamp); return d>=range.from && d<=range.to; });
+function pct(n, total) { return total ? Math.round(n / total * 100) : 0; }
 
-  const _ts2=document.getElementById('topbar-sub'); if(_ts2) _ts2.textContent = getPeriodLabel();
-
-  const total    = filtered.reduce((s,o)=>s+o.total,0);
-  const count    = filtered.length;
-  const avg      = count ? Math.round(total/count) : 0;
-  const itemQty  = filtered.reduce((s,o)=>{
-    const items = Array.isArray(o.items) ? o.items : (typeof o.items==='string' ? JSON.parse(o.items) : []);
-    return s + items.reduce((q,i)=>q+i.qty,0);
-  },0);
-
-  document.getElementById('stat-revenue').textContent    = '฿'+total.toLocaleString();
-  document.getElementById('stat-revenue-sub').textContent= count ? `from ${count} order${count!==1?'s':''}` : 'no orders';
-  document.getElementById('stat-orders').textContent     = count;
-  document.getElementById('stat-orders-sub').textContent = count ? `${itemQty} items sold` : '';
-  document.getElementById('stat-avg').textContent        = '฿'+avg;
-  document.getElementById('stat-items').textContent      = itemQty;
-
-  // Payment breakdown
-  const payMap = {};
-  filtered.forEach(o=>{ payMap[o.payment]=payMap[o.payment]||{count:0,total:0}; payMap[o.payment].count++; payMap[o.payment].total+=o.total; });
-  const payEntries = Object.entries(payMap).sort((a,b)=>b[1].total-a[1].total);
-  const payEl = document.getElementById('payment-breakdown');
-  if(!payEntries.length){ payEl.innerHTML='<div class="empty-state">No orders yet</div>'; }
-  else payEl.innerHTML = payEntries.map(([method,data])=>{
-    const pct = total ? Math.round(data.total/total*100) : 0;
-    const icon = method==='Cash'?'💵':method==='QR Code'?'📱':'💳';
-    return `<div class="payment-row">
-      <div class="payment-row-label">${icon} ${method}</div>
-      <div class="payment-row-bar-wrap"><div class="payment-row-bar" style="width:${pct}%"></div></div>
-      <div class="payment-row-count">${data.count} orders</div>
-      <div class="payment-row-val">฿${data.total.toLocaleString()}</div>
-    </div>`;
-  }).join('');
-
-  // Top items — fix: show type only if not empty, avoid "()"
-  const itemMap = {};
-  filtered.forEach(o=>{
-    const items = Array.isArray(o.items) ? o.items : (typeof o.items==='string' ? JSON.parse(o.items) : []);
-    items.forEach(i=>{
-      const key = i.type ? `${i.name} (${i.type})` : i.name;
-      itemMap[key]=itemMap[key]||{qty:0,revenue:0};
-      itemMap[key].qty+=i.qty; itemMap[key].revenue+=i.price*i.qty;
-    });
-  });
-  const topItems = Object.entries(itemMap).sort((a,b)=>b[1].qty-a[1].qty).slice(0,8);
-  const topEl = document.getElementById('top-items');
-  if(!topItems.length){ topEl.innerHTML='<div class="empty-state">No orders yet</div>'; }
-  else topEl.innerHTML = topItems.map(([name,data],i)=>`
-    <div class="top-item-row">
-      <div class="top-item-rank">#${i+1}</div>
-      <div class="top-item-name">${name}</div>
-      <div class="top-item-qty">${data.qty} sold</div>
-      <div class="top-item-rev">฿${data.revenue.toLocaleString()}</div>
-    </div>`).join('');
-
-  // Orders table — no status column
-  const sorted = [...filtered].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-  const tbody = document.getElementById('orders-tbody');
-  const empty = document.getElementById('orders-empty');
-  if(!sorted.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  tbody.innerHTML = sorted.map(o=>{
-    const items = Array.isArray(o.items) ? o.items : (typeof o.items==='string' ? JSON.parse(o.items) : []);
-    const summary = items.map(i=>`${i.name} ×${i.qty}`).join(', ');
-    const short   = summary.length>55 ? summary.slice(0,52)+'…' : summary;
-    return `<tr class="clickable-row" onclick="window.location.href='order.html#detail/${o.id}'">
-      <td><span class="order-id-link">${o.id}</span></td>
-      <td style="white-space:nowrap;font-size:0.8rem;">${fmtDate(new Date(o.timestamp))}</td>
-      <td style="font-size:0.78rem;color:var(--brown-mid);">${short}</td>
-      <td><span class="payment-badge">${o.payment||'—'}</span></td>
-      <td style="text-align:right;font-weight:500;color:var(--espresso);">฿${o.total}</td>
-    </tr>`;
-  }).join('');
+// Find category for an item by matching itemId → menu_items → categories
+function getCatForItem(item) {
+  const mi = menuItems.find(m => m.id === item.itemId || m.name === item.name);
+  if(!mi) return null;
+  return cats.find(c => c.id === mi.cat_id);
 }
 
-// Init
-const today = new Date().toISOString().slice(0,10);
-document.getElementById('date-from').value = today;
-document.getElementById('date-to').value   = today;
+// ══ DONUT PIE CHART ══
+function buildDonut(entries, total, colorMap) {
+  const size = 150, cx = 75, cy = 75, r = 55, strokeW = 22;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+  // Start from top (rotate -90deg)
+  const segments = entries.map(([key, qty]) => {
+    const fraction = total ? qty / total : 0;
+    const dash     = fraction * circumference;
+    const gap      = circumference - dash;
+    const seg = `<circle
+      cx="${cx}" cy="${cy}" r="${r}"
+      fill="none"
+      stroke="${colorMap[key]||'#ccc'}"
+      stroke-width="${strokeW}"
+      stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+      stroke-dashoffset="${(-offset * circumference / (2*Math.PI*r) * circumference + circumference * 0.25).toFixed(2)}"
+      transform="rotate(-90 ${cx} ${cy})"
+      style="transition:stroke-dasharray 0.5s ease;"
+    />`;
+    offset += fraction * circumference;
+    return seg;
+  });
+
+  // Recalculate properly using angle offsets
+  let startAngle = -90;
+  const segsClean = entries.map(([key, qty]) => {
+    const fraction = total ? qty / total : 0;
+    const angle    = fraction * 360;
+    const dash     = fraction * circumference;
+    const gap      = circumference - dash;
+    const dashOffset = circumference * (1 - (startAngle + 90) / 360);
+    const seg = `<circle
+      cx="${cx}" cy="${cy}" r="${r}"
+      fill="none"
+      stroke="${colorMap[key]||'#ccc'}"
+      stroke-width="${strokeW}"
+      stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+      stroke-dashoffset="${(circumference - circumference * ((startAngle + 90) / 360)).toFixed(2)}"
+      transform="rotate(-90 ${cx} ${cy})"
+    />`;
+    startAngle += angle;
+    return seg;
+  });
+
+  const topLabel = entries[0] ? `${pct(entries[0][1], total)}%` : '';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(200,168,130,0.15)" stroke-width="${strokeW}"/>
+    ${segsClean.join('')}
+    <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle"
+      font-family="DM Sans,sans-serif" font-size="16" font-weight="700" fill="#2C1A0E">${topLabel}</text>
+  </svg>`;
+}
+
+// ══ RENDER ══
+async function render() {
+  const range = getRange(); if(!range) return;
+
+  // Reload fresh data each render
+  const [oRes, mRes, cRes] = await Promise.all([
+    db.from('orders').select('*').order('timestamp', { ascending: false }),
+    db.from('menu_items').select('*'),
+    db.from('categories').select('*').order('sort_order'),
+  ]);
+  allOrders = oRes.data || [];
+  menuItems  = mRes.data || [];
+  cats       = cRes.data || [];
+
+  const filtered = allOrders.filter(o => {
+    const d = new Date(o.timestamp);
+    return d >= range.from && d <= range.to;
+  });
+
+  renderScorecards(filtered);
+  renderPayment(filtered);
+  renderCategories(filtered);
+  renderDrinkInsights(filtered);
+  renderFoodInsights(filtered);
+}
+
+// ── SCORECARDS ──
+function renderScorecards(orders) {
+  const total    = orders.reduce((s,o) => s + o.total, 0);
+  const count    = orders.length;
+  const items    = orders.flatMap(o => safeItems(o));
+  const itemsQty = items.reduce((s,i) => s + i.qty, 0);
+  const avg      = count ? Math.round(total / count) : 0;
+  const avgItems = count ? (itemsQty / count).toFixed(1) : 0;
+
+  document.getElementById('sc-revenue').textContent     = '฿' + total.toLocaleString();
+  document.getElementById('sc-revenue-sub').textContent = `from ${count} order${count!==1?'s':''}`;
+  document.getElementById('sc-orders').textContent      = count;
+  document.getElementById('sc-orders-sub').textContent  = `avg ${avgItems} items per order`;
+  document.getElementById('sc-avg').textContent         = '฿' + avg.toLocaleString();
+  document.getElementById('sc-items').textContent       = itemsQty;
+}
+
+// ── PAYMENT ──
+function renderPayment(orders) {
+  const payMap = {};
+  orders.forEach(o => {
+    const key = o.payment || 'Other';
+    payMap[key] = payMap[key] || { count:0, total:0 };
+    payMap[key].count++;
+    payMap[key].total += o.total;
+  });
+  const entries = Object.entries(payMap).sort((a,b) => b[1].total - a[1].total);
+  const maxVal  = Math.max(...entries.map(e => e[1].total), 1);
+  const el = document.getElementById('payment-breakdown');
+  if(!entries.length) { el.innerHTML = '<div class="empty-state">No data</div>'; return; }
+  const icons = { 'Cash':'💵', 'QR Code':'📱' };
+  const fills = { 'Cash':'fill-cash', 'QR Code':'fill-qr' };
+  el.innerHTML = entries.map(([method, data]) => `
+    <div class="bar-row">
+      <div class="bar-label">${icons[method]||'💳'} ${method} <span class="bar-label-sub">(${data.count} order${data.count!==1?'s':''})</span></div>
+      <div class="bar-track"><div class="bar-fill ${fills[method]||'fill-brown'}" style="width:${pct(data.total,maxVal)}%"></div></div>
+      <div class="bar-val">฿${data.total.toLocaleString()}</div>
+    </div>`).join('');
+}
+
+// ── CATEGORY REVENUE ──
+function renderCategories(orders) {
+  const catMap = {};
+  orders.forEach(o => {
+    safeItems(o).forEach(item => {
+      const cat = getCatForItem(item);
+      const key = cat ? cat.id : '__unknown__';
+      const label = cat ? `${cat.icon||''} ${cat.name}` : 'Other';
+      catMap[key] = catMap[key] || { label, total:0 };
+      catMap[key].total += item.price * item.qty;
+    });
+  });
+  const entries = Object.entries(catMap).sort((a,b) => b[1].total - a[1].total);
+  const maxVal  = Math.max(...entries.map(e => e[1].total), 1);
+  const el = document.getElementById('category-breakdown');
+  if(!entries.length) { el.innerHTML = '<div class="empty-state">No data</div>'; return; }
+  el.innerHTML = entries.map(([, data]) => `
+    <div class="bar-row">
+      <div class="bar-label">${data.label}</div>
+      <div class="bar-track"><div class="bar-fill fill-brown" style="width:${pct(data.total,maxVal)}%"></div></div>
+      <div class="bar-val">฿${data.total.toLocaleString()}</div>
+    </div>`).join('');
+}
+
+// ── DRINK INSIGHTS ──
+function renderDrinkInsights(orders) {
+  // Collect all drink line items (non-food = has a type)
+  const drinkLines = [];
+  orders.forEach(o => {
+    safeItems(o).forEach(item => {
+      const cat = getCatForItem(item);
+      if(cat && cat.type !== 'food') drinkLines.push(item);
+    });
+  });
+
+  // Top drinks grouped by name+type
+  const drinkMap = {};
+  drinkLines.forEach(i => {
+    const key = i.type ? `${i.name} (${i.type})` : i.name;
+    drinkMap[key] = drinkMap[key] || { qty:0, revenue:0, sweetness:{} };
+    drinkMap[key].qty     += i.qty;
+    drinkMap[key].revenue += i.price * i.qty;
+    const sw = i.sweetness || 'Normal';
+    drinkMap[key].sweetness[sw] = (drinkMap[key].sweetness[sw]||0) + i.qty;
+  });
+  const topDrinks = Object.entries(drinkMap).sort((a,b) => b[1].qty - a[1].qty).slice(0,5);
+
+  const drinkEl = document.getElementById('top-drinks');
+  if(!topDrinks.length) { drinkEl.innerHTML = '<div class="empty-state">No drink orders yet</div>'; }
+  else {
+    drinkEl.innerHTML = topDrinks.map(([name, data], idx) => {
+      const totalQty = data.qty;
+      const swEntries = Object.entries(data.sweetness).sort((a,b)=>b[1]-a[1]);
+      const swColors  = { 'More Sweet':'#F59E0B','Normal':'#10B981','Less Sweet':'#3B82F6','No Sugar':'#9CA3AF' };
+      const swBar = swEntries.map(([sw,q]) =>
+        `<div style="width:${pct(q,totalQty)}%;background:${swColors[sw]||'#ccc'};height:100%;"></div>`
+      ).join('');
+      const swLabels = swEntries.map(([sw,q]) =>
+        `<span class="sw-label"><span class="sw-dot" style="background:${swColors[sw]||'#ccc'}"></span>${pct(q,totalQty)}% ${sw}</span>`
+      ).join('');
+      return `<div class="drink-item">
+        <div class="drink-item-top">
+          <span class="drink-rank">#${idx+1}</span>
+          <span class="drink-name">${name}</span>
+          <span class="drink-sold">${data.qty} sold</span>
+          <span class="drink-rev">฿${data.revenue.toLocaleString()}</span>
+        </div>
+        <div class="sweetness-bar-wrap">${swBar}</div>
+        <div class="sweetness-labels">${swLabels}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Quick Drink Trends — pie charts
+  const tempMap = {}, swMap = {};
+  drinkLines.forEach(i => {
+    const t = i.type || 'Other';
+    tempMap[t] = (tempMap[t]||0) + i.qty;
+    const sw = i.sweetness || 'Normal';
+    swMap[sw] = (swMap[sw]||0) + i.qty;
+  });
+  const totalDrinks = drinkLines.reduce((s,i) => s+i.qty, 0);
+
+  const tempColors = { 'Hot':'#F59E0B','Iced':'#3B82F6','Blend':'#8B5CF6','Other':'#9CA3AF' };
+  const swColors2  = { 'More Sweet':'#F59E0B','Normal':'#10B981','Less Sweet':'#3B82F6','No Sugar':'#9CA3AF' };
+  const tempIcons  = { 'Hot':'🔥','Iced':'❄️','Blend':'🌀' };
+
+  const tempEntries = Object.entries(tempMap).sort((a,b)=>b[1]-a[1]);
+  const swEntries2  = Object.entries(swMap).sort((a,b)=>b[1]-a[1]);
+
+  const trendsEl = document.getElementById('drink-trends');
+  if(!drinkLines.length) { trendsEl.innerHTML = '<div class="empty-state">No drink orders yet</div>'; return; }
+
+  trendsEl.innerHTML = `
+    <div class="pie-charts-wrap">
+      <div class="pie-chart-block">
+        <div class="pie-chart-label">🌡️ Temperature
+          <span class="info-wrap" onclick="this.classList.toggle('open')">
+            <span class="info-icon">i</span>
+            <span class="tooltip">% of drink items ordered at each temperature.</span>
+          </span>
+        </div>
+        ${buildDonut(tempEntries, totalDrinks, tempColors)}
+        <div class="pie-legend">
+          ${tempEntries.map(([t,q])=>`
+            <div class="pie-legend-row">
+              <span class="pie-legend-dot" style="background:${tempColors[t]||'#ccc'}"></span>
+              <span class="pie-legend-name">${tempIcons[t]||''} ${t}</span>
+              <span class="pie-legend-pct">${pct(q,totalDrinks)}% <span style="font-size:0.68rem;color:var(--brown-light);font-weight:400;">(${q})</span></span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div style="height:1px;background:rgba(200,168,130,0.2);width:100%;"></div>
+      <div class="pie-chart-block">
+        <div class="pie-chart-label">🍯 Sweetness
+          <span class="info-wrap" onclick="this.classList.toggle('open')">
+            <span class="info-icon">i</span>
+            <span class="tooltip">How customers customised sweetness across all drink orders.</span>
+          </span>
+        </div>
+        ${buildDonut(swEntries2, totalDrinks, swColors2)}
+        <div class="pie-legend">
+          ${swEntries2.map(([sw,q])=>`
+            <div class="pie-legend-row">
+              <span class="pie-legend-dot" style="background:${swColors2[sw]||'#ccc'}"></span>
+              <span class="pie-legend-name">${sw}</span>
+              <span class="pie-legend-pct">${pct(q,totalDrinks)}% <span style="font-size:0.68rem;color:var(--brown-light);font-weight:400;">(${q})</span></span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── FOOD INSIGHTS ──
+function renderFoodInsights(orders) {
+  const foodLines = [], drinkNames = {};
+  const ordersWithFood = [];
+
+  orders.forEach(o => {
+    const items = safeItems(o);
+    const hasFood  = items.some(i => { const c=getCatForItem(i); return c&&c.type==='food'; });
+    const hasDrink = items.some(i => { const c=getCatForItem(i); return c&&c.type!=='food'; });
+    if(hasFood) ordersWithFood.push(o);
+
+    items.forEach(i => {
+      const cat = getCatForItem(i);
+      if(cat && cat.type === 'food') foodLines.push(i);
+      else if(hasFood && cat && cat.type !== 'food') {
+        // This drink was ordered alongside food
+        const dn = i.type ? `${i.name} (${i.type})` : i.name;
+        drinkNames[dn] = (drinkNames[dn]||0) + i.qty;
+      }
+    });
+  });
+
+  // Top food
+  const foodMap = {};
+  foodLines.forEach(i => {
+    foodMap[i.name] = foodMap[i.name] || { qty:0, revenue:0 };
+    foodMap[i.name].qty     += i.qty;
+    foodMap[i.name].revenue += i.price * i.qty;
+  });
+  const topFood = Object.entries(foodMap).sort((a,b)=>b[1].qty-a[1].qty).slice(0,5);
+
+  const foodEl = document.getElementById('top-food');
+  if(!topFood.length) { foodEl.innerHTML = '<div class="empty-state">No food orders yet</div>'; }
+  else foodEl.innerHTML = topFood.map(([name,data],idx) => `
+    <div class="food-item">
+      <span class="food-rank">#${idx+1}</span>
+      <span class="food-name">${name}</span>
+      <span class="food-sold">${data.qty} sold</span>
+      <span class="food-rev">฿${data.revenue.toLocaleString()}</span>
+    </div>`).join('');
+
+  // Food pairing trends
+  const attachRate = orders.length ? pct(ordersWithFood.length, orders.length) : 0;
+  const bestCompanion = Object.entries(drinkNames).sort((a,b)=>b[1]-a[1])[0];
+
+  const trendsEl = document.getElementById('food-trends');
+  if(!foodLines.length) { trendsEl.innerHTML = '<div class="empty-state">No food orders yet</div>'; return; }
+
+  trendsEl.innerHTML = `
+    <div class="trend-row">
+      <span class="trend-label">🍽️ Food Attach Rate
+        <span class="info-wrap" onclick="this.classList.toggle('open')">
+          <span class="info-icon">i</span>
+          <span class="tooltip">% of orders that include at least one food item. Higher = food sells well alongside drinks.</span>
+        </span>
+      </span>
+      <span class="trend-val">${attachRate}% <span style="font-size:0.72rem;color:var(--brown-light);">(${ordersWithFood.length} of ${orders.length} orders)</span></span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-label">☕ Best Drink Companion
+        <span class="info-wrap" onclick="this.classList.toggle('open')">
+          <span class="info-icon">i</span>
+          <span class="tooltip">The drink most frequently ordered in the same order as food.</span>
+        </span>
+      </span>
+      <span class="trend-val">${bestCompanion ? bestCompanion[0] : '—'}</span>
+    </div>`;
+}
+
+// ══ INIT ══
+const todayStr = new Date().toISOString().slice(0,10);
+document.getElementById('date-from').value = todayStr;
+document.getElementById('date-to').value   = todayStr;
 render();
 </script>
 </body>
