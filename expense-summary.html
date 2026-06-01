@@ -152,10 +152,23 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
 @media (max-width: 480px) {
   .scorecard-val { font-size: 1.5rem; }
 }
+
+@media (max-width: 768px) {
+  .content, .list-content, .detail-content, .history-content, .summary-content {
+    padding-bottom: 80px !important;
+  }
+}
 </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div id="app">
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar" style="display:none;background:var(--warm-white);border-bottom:1px solid rgba(200,168,130,0.2);padding:0.65rem 1rem;align-items:center;gap:0.75rem;position:sticky;top:0;z-index:100;flex-shrink:0;">
+  <button onclick="openSidebar()" style="background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--espresso);width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px;flex-shrink:0;">☰</button>
+  <span style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:500;color:var(--espresso);flex:1;">Expense Summary</span>
+  
+</div>
   <div class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-brand-name">195 <span>Café</span></div>
