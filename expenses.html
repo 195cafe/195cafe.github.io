@@ -307,38 +307,15 @@ tr:hover td{background:rgba(200,168,130,0.04);}
             <span class="search-icon">🔍</span>
             <input type="text" class="search-input" id="list-search" placeholder="Search by name…" oninput="currentPage=1;renderList()">
           </div>
-          <div class="filter-divider"></div>
           <div class="filter-pill">
             <span class="filter-pill-label">Date</span>
             <select class="filter-select" id="list-date" onchange="currentPage=1;renderList()">
               <option value="today">Today</option>
               <option value="week">This Week</option>
-              <option value="month" selected>This Month</option>
-              <option value="all">All Dates</option>
+              <option value="month">This Month</option>
+              <option value="all" selected>All Dates</option>
             </select>
           </div>
-          <div class="filter-pill">
-            <span class="filter-pill-label">Sort by</span>
-            <select class="filter-select" id="list-sort" onchange="currentPage=1;renderList()">
-              <option value="date-desc">Newest First</option>
-              <option value="date-asc">Oldest First</option>
-              <option value="amount-desc">Highest Amount</option>
-              <option value="amount-asc">Lowest Amount</option>
-            </select>
-          </div>
-          <div class="filter-pill">
-            <span class="filter-pill-label">Per page</span>
-            <select class="filter-select" id="list-pagesize" onchange="currentPage=1;renderList()">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-          <button class="clear-btn" onclick="clearFilters()">✕ Clear</button>
-        </div>
-        <div class="filter-bar-bottom">
-          <span class="filter-label">Filter:</span>
           <div class="filter-pill">
             <span class="filter-pill-label">Category</span>
             <select class="filter-select" id="list-cat" onchange="currentPage=1;renderList()">
@@ -370,9 +347,10 @@ tr:hover td{background:rgba(200,168,130,0.04);}
               <option>Ying</option>
             </select>
           </div>
+          <button class="clear-btn" onclick="clearFilters()">✕ Clear</button>
         </div>
       </div>
-
+      <!-- Table -->
       <!-- Table -->
       <div class="table-wrap">
         <table>
@@ -826,7 +804,7 @@ function clearFilters() {
   document.getElementById('list-cat').value      = 'all';
   document.getElementById('list-payment').value  = 'all';
   document.getElementById('list-paidby').value   = 'all';
-  document.getElementById('list-date').value     = 'month';
+  document.getElementById('list-date').value     = 'all';
   sortCol='date'; sortDir='desc';
   currentPage=1;
   renderList();
@@ -899,6 +877,7 @@ function renderList() {
       <td class="amount-cell" style="text-align:right;">฿${parseFloat(e.amount).toLocaleString()}</td>
       <td>
         <div class="actions-cell">
+          <button class="btn btn-outline btn-sm" onclick="navigate('detail/${e.id}')">View</button>
           <button class="btn btn-outline btn-sm" onclick="openModal('${e.id}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">Delete</button>
         </div>
@@ -938,10 +917,11 @@ function fmtDate(dateStr){
   return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
 }
 function getFromDate(f){
-  const now=new Date(); const t=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  if(f==='today') return t.toISOString().slice(0,10);
-  if(f==='week'){ const w=new Date(t); w.setDate(t.getDate()-t.getDay()); return w.toISOString().slice(0,10); }
-  if(f==='month') return new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);
+  const now=new Date();
+  function localStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  if(f==='today') return localStr(now);
+  if(f==='week'){ const w=new Date(now); w.setDate(now.getDate()-now.getDay()); return localStr(w); }
+  if(f==='month') return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
   return null;
 }
 let toastTimer;
