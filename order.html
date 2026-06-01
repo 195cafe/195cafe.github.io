@@ -479,11 +479,12 @@ async function handleRoute() {
     renderCart();
 
   } else if(view === 'detail' && param) {
-    const order = orders.find(o=>o.id===param);
-    if(!order){ navigate('list'); return; }
-    currentDetailId = param;
     document.getElementById('view-detail').classList.add('active');
-    renderDetail(order);
+    currentDetailId = param;
+    // Fetch directly from Supabase to guarantee fresh data
+    const { data: orderRows, error: oErr } = await db.from('orders').select('*').eq('id', param).single();
+    if(oErr || !orderRows){ showToast('Order not found','error'); navigate('list'); return; }
+    renderDetail(orderRows);
 
   } else {
     navigate('list');
