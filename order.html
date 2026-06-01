@@ -632,12 +632,19 @@ function renderFormMenu() {
   const filtered = activeCat==='all' ? menuItems : menuItems.filter(i=>i.catId===activeCat);
   if(!filtered.length){ grid.innerHTML='<div style="color:var(--brown-light);font-size:0.85rem;padding:0.5rem 0;">No items in this category.</div>'; return; }
   grid.innerHTML = filtered.map(item=>{
-    const cat = cats.find(c=>c.id===item.catId);
-    const prices = [];
-    if(item.hot  !=null) prices.push({label:'Hot',   val:item.hot});
-    if(item.iced !=null) prices.push({label:'Iced',  val:item.iced});
-    if(item.blend!=null) prices.push({label:'Blend', val:item.blend});
-    const chips = prices.map(p=>`<span class="price-chip" onclick="addToCart('${item.id}','${p.label}',${p.val},event)">${p.label} ${p.val}฿</span>`).join('');
+    const cat    = cats.find(c=>c.id===item.catId);
+    const isFood = cat?.type === 'food';
+    let chips = '';
+    if(isFood) {
+      // Food: single price chip, no temperature label
+      if(item.hot != null) chips = `<span class="price-chip" onclick="addToCart('${item.id}','',${item.hot},event)">${item.hot}฿</span>`;
+    } else {
+      const prices=[];
+      if(item.hot  !=null) prices.push({label:'Hot',   val:item.hot});
+      if(item.iced !=null) prices.push({label:'Iced',  val:item.iced});
+      if(item.blend!=null) prices.push({label:'Blend', val:item.blend});
+      chips = prices.map(p=>`<span class="price-chip" onclick="addToCart('${item.id}','${p.label}',${p.val},event)">${p.label} ${p.val}฿</span>`).join('');
+    }
     const photo = (item.photos && item.photos[0])
       ? `<img class="menu-card-photo" src="${item.photos[0]}" alt="${item.name}" loading="lazy">`
       : `<div class="menu-card-photo-placeholder">${cat?cat.icon:'☕'}</div>`;
@@ -688,7 +695,7 @@ function renderCart() {
       <div class="cart-item-top">
         <div style="flex:1;">
           <div class="cart-item-name">${c.name}</div>
-          <div class="cart-item-type">${c.type} · ${c.price}฿ each</div>
+          <div class="cart-item-type">${c.type ? c.type+' · ' : ''}${c.price}฿ each</div>
         </div>
         <div class="cart-item-price">฿${c.price*c.qty}</div>
         <button class="remove-item-btn" onclick="removeFromCart('${c.key}')">✕</button>
@@ -755,7 +762,7 @@ function renderDetail(order) {
     <div class="detail-item-row">
       <div class="detail-item-info">
         <div class="detail-item-name">${i.name}</div>
-        <div class="detail-item-meta">${i.type} · ${i.sweetness||'Normal'}</div>
+        <div class="detail-item-meta">${i.type ? i.type+' · ' : ''}${i.sweetness||'Normal'}</div>
         ${i.note ? `<div class="detail-item-note">📝 ${i.note}</div>` : ''}
       </div>
       <div class="detail-item-qty">×${i.qty}</div>

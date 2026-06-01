@@ -60,7 +60,7 @@
   .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
   .stat-card{background:var(--warm-white);border-radius:12px;padding:1rem 1.25rem;border:1px solid rgba(200,168,130,0.2);}
   .stat-card-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--brown-light);margin-bottom:0.4rem;}
-  .stat-card-val{font-family:"Cormorant Garamond",serif;font-size:2rem;font-weight:500;color:var(--espresso);line-height:1;}
+  .stat-card-val{font-family:"DM Sans",sans-serif;font-size:2rem;font-weight:700;color:var(--espresso);line-height:1;letter-spacing:-0.02em;}
   .stat-card-sub{font-size:0.72rem;color:var(--brown-mid);margin-top:3px;}
 
   /* TOOLBAR */
@@ -322,20 +322,14 @@
         </div>
       </div>
 
-      <!-- Category -->
       <div class="form-group">
         <label class="form-label">Category *</label>
-        <select class="form-select" id="f-cat"></select>
+        <select class="form-select" id="f-cat" onchange="updatePriceFields()"></select>
       </div>
 
-      <!-- Prices -->
-      <div class="form-group">
-        <label class="form-label">Prices (฿) — leave blank if not available</label>
-        <div class="form-row">
-          <div><input type="number" class="form-input" id="f-hot" placeholder="Hot"><div class="form-hint">🔥 Hot</div></div>
-          <div><input type="number" class="form-input" id="f-iced" placeholder="Iced"><div class="form-hint">🧊 Iced</div></div>
-          <div><input type="number" class="form-input" id="f-blend" placeholder="Blended"><div class="form-hint">🌀 Blended</div></div>
-        </div>
+      <!-- Prices — changes based on category type -->
+      <div class="form-group" id="price-section">
+        <!-- Populated by updatePriceFields() when category changes -->
       </div>
 
       <!-- Bilingual Notes -->
@@ -495,8 +489,12 @@ function renderTable(){
   if(!filtered.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
   tbody.innerHTML = filtered.map(item=>{
-    const cat = cats.find(c=>c.id===item.catId);
-    const p = v => v ? `<span>${v}฿</span>` : `<span style="color:var(--brown-light)">—</span>`;
+    const cat    = cats.find(c=>c.id===item.catId);
+    const isFood = cat?.type === 'food';
+    const p      = v => v ? `<span>${v}฿</span>` : `<span style="color:var(--brown-light)">—</span>`;
+    const priceCell = isFood
+      ? (item.hot ? `<span>${item.hot}฿</span>` : `<span style="color:var(--brown-light)">—</span>`)
+      : `${p(item.hot)} ${p(item.iced)} ${p(item.blend)}`;
     const photos = item.photos||[];
     const thumbs = [0,1,2].map(i=>photos[i]
       ? `<img class="thumb" src="${photos[i]}" alt="">`
@@ -512,8 +510,8 @@ function renderTable(){
         <span class="item-cat">${cat?cat.icon+' '+cat.name:'—'}</span>
         ${cat&&cat.nameTh?`<div style="font-size:0.68rem;color:var(--brown-light);font-family:'Sarabun',sans-serif;margin-top:2px;">${cat.nameTh}</div>`:''}
       </td>
-      <td class="price-cell">${p(item.hot)} ${p(item.iced)} ${p(item.blend)}</td>
-      <td><span class="status-badge ${item.available?'status-available':'status-soldout'}">${item.available?'● Available':'● Sold Out'}</span></td>
+      <td class="price-cell">${priceCell}</td>
+      <td><span class="status-badge ${item.available?'status-available':'status-soldout'}">${item.available?'Available':'Sold Out'}</span></td>
       <td>
         <div class="actions">
           <button class="btn btn-outline btn-sm" onclick="toggleAvailable('${item.id}')">${item.available?'Mark Sold Out':'Mark Available'}</button>
@@ -527,7 +525,29 @@ function renderTable(){
 
 function renderCatSelects(){
   const sel = document.getElementById('f-cat');
-  sel.innerHTML = cats.map(c=>`<option value="${c.id}">${c.icon} ${c.name} / ${c.nameTh||'—'}</option>`).join('');
+  sel.innerHTML = cats.map(c=>`<option value="${c.id}" data-type="${c.type||'beverage'}">${c.icon} ${c.name} / ${c.nameTh||'—'}</option>`).join('');
+  updatePriceFields();
+}
+
+function updatePriceFields(hotVal='', icedVal='', blendVal='', priceVal='') {
+  const sel     = document.getElementById('f-cat');
+  const opt     = sel.options[sel.selectedIndex];
+  const catType = opt ? (opt.dataset.type || 'beverage') : 'beverage';
+  const section = document.getElementById('price-section');
+  if(catType === 'food') {
+    section.innerHTML = `
+      <label class="form-label">Price (฿) *</label>
+      <input type="number" class="form-input" id="f-price" placeholder="Price" value="${priceVal}" style="max-width:180px;">
+      <div class="form-hint">Single price for this item</div>`;
+  } else {
+    section.innerHTML = `
+      <label class="form-label">Prices (฿) — leave blank if not available</label>
+      <div class="form-row">
+        <div><input type="number" class="form-input" id="f-hot" placeholder="Hot" value="${hotVal}"><div class="form-hint">🔥 Hot</div></div>
+        <div><input type="number" class="form-input" id="f-iced" placeholder="Iced" value="${icedVal}"><div class="form-hint">🧊 Iced</div></div>
+        <div><input type="number" class="form-input" id="f-blend" placeholder="Blended" value="${blendVal}"><div class="form-hint">🌀 Blended</div></div>
+      </div>`;
+  }
 }
 
 function renderCatList(){
@@ -551,10 +571,11 @@ function renderCatList(){
 function openAddModal(){
   document.getElementById('modal-title').textContent = 'Add Menu Item';
   document.getElementById('edit-id').value='';
-  ['f-name','f-name-th','f-hot','f-iced','f-blend','f-notes','f-notes-th'].forEach(id=>document.getElementById(id).value='');
+  ['f-name','f-name-th','f-notes','f-notes-th'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f-available').checked=true;
   currentPhotos=[];
   renderCatSelects();
+  updatePriceFields();
   renderPhotoSlots();
   document.getElementById('item-modal').classList.add('open');
 }
@@ -564,15 +585,17 @@ function openEditModal(id){
   document.getElementById('edit-id').value=item.id;
   document.getElementById('f-name').value=item.name;
   document.getElementById('f-name-th').value=item.nameTh||'';
-  document.getElementById('f-hot').value=item.hot||'';
-  document.getElementById('f-iced').value=item.iced||'';
-  document.getElementById('f-blend').value=item.blend||'';
   document.getElementById('f-notes').value=item.notes||'';
   document.getElementById('f-notes-th').value=item.notesTh||'';
   document.getElementById('f-available').checked=item.available;
   currentPhotos=[...(item.photos||[])];
   renderCatSelects();
   document.getElementById('f-cat').value=item.catId;
+  // Determine cat type and pass values
+  const cat = cats.find(c=>c.id===item.catId);
+  const isFood = cat?.type === 'food';
+  // For food items, hot field stores the single price
+  updatePriceFields(item.hot||'', item.iced||'', item.blend||'', isFood?(item.hot||''):'');
   renderPhotoSlots();
   document.getElementById('item-modal').classList.add('open');
 }
@@ -583,13 +606,26 @@ async function saveItem(){
   const catId=document.getElementById('f-cat').value;
   if(!name){ showToast('Please enter English item name','error'); return; }
   if(!catId){ showToast('Please select a category','error'); return; }
+
+  const cat    = cats.find(c=>c.id===catId);
+  const isFood = cat?.type === 'food';
+  let hot=null, iced=null, blend=null;
+  if(isFood){
+    const price = parseFloat(document.getElementById('f-price')?.value)||null;
+    if(!price){ showToast('Please enter a price','error'); return; }
+    hot = price; // store single price in hot field
+  } else {
+    hot   = parseFloat(document.getElementById('f-hot')?.value)||null;
+    iced  = parseFloat(document.getElementById('f-iced')?.value)||null;
+    blend = parseFloat(document.getElementById('f-blend')?.value)||null;
+    if(!hot && !iced && !blend){ showToast('Please enter at least one price','error'); return; }
+  }
+
   const data={
     name,
     name_th:   document.getElementById('f-name-th').value.trim(),
     cat_id:    catId,
-    hot:       parseFloat(document.getElementById('f-hot').value)||null,
-    iced:      parseFloat(document.getElementById('f-iced').value)||null,
-    blend:     parseFloat(document.getElementById('f-blend').value)||null,
+    hot, iced, blend,
     notes:     document.getElementById('f-notes').value.trim(),
     notes_th:  document.getElementById('f-notes-th').value.trim(),
     available: document.getElementById('f-available').checked,

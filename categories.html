@@ -175,6 +175,13 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--cream);c
           <div class="form-hint">Lower = appears first</div>
         </div>
       </div>
+      <div class="form-group">
+        <label class="form-label">Category Type *</label>
+        <select class="form-input" id="f-type" style="cursor:pointer;">
+          <option value="beverage">☕ Beverage — shows Hot / Iced / Blend prices</option>
+          <option value="food">🍞 Food — shows single price only</option>
+        </select>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
@@ -226,6 +233,7 @@ function render() {
         <div class="cat-name-th">${c.name_th||'<span style="opacity:0.4;font-family:DM Sans;font-size:0.72rem;">no Thai name</span>'}</div>
       </div>
       <div class="cat-count">${count} item${count!==1?'s':''}</div>
+      <div class="cat-order" style="font-size:0.72rem;color:var(--brown-light);">${c.type==='food'?'🍞 Food':'☕ Beverage'}</div>
       <div class="cat-order">Order: ${c.sort_order||0}</div>
       <div class="actions">
         <button class="btn btn-outline btn-sm" onclick="openModal('${c.id}')">Edit</button>
@@ -250,6 +258,7 @@ function openModal(editId) {
     document.getElementById('f-name-th').value  = c.name_th||'';
     document.getElementById('f-icon').value     = c.icon||'';
     document.getElementById('f-sort').value     = c.sort_order||0;
+    document.getElementById('f-type').value     = c.type||'beverage';
     document.getElementById('modal-title').textContent = 'Edit Category';
   }
   document.getElementById('cat-modal').classList.add('open');
@@ -262,10 +271,11 @@ async function saveCategory() {
   const nameTh  = document.getElementById('f-name-th').value.trim();
   const icon    = document.getElementById('f-icon').value.trim() || '📋';
   const sort    = parseInt(document.getElementById('f-sort').value) || 0;
+  const type    = document.getElementById('f-type').value || 'beverage';
 
   if(!name){ showToast('Please enter an English name','error'); return; }
 
-  const data = { name, name_th: nameTh, icon, sort_order: sort };
+  const data = { name, name_th: nameTh, icon, sort_order: sort, type };
   let error;
   if(editId){
     ({error} = await db.from('categories').update(data).eq('id', editId));
